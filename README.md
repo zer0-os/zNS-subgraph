@@ -1,2 +1,3 @@
 # ZNS-subgraph
-# ZNS-subgraph
+
+npm i
