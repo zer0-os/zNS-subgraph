@@ -1,0 +1,16 @@
+{
+  "name": "ZNS-subgraph",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ zer0-os/ZNS-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ zer0-os/ZNS-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ zer0-os/ZNS-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 zer0-os/ZNS-subgraph"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.19.0",
+    "@graphprotocol/graph-ts": "0.19.0"
+  }
+}
