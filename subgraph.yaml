@@ -1,4 +1,6 @@
 specVersion: 0.0.2
+description: ZNS subgraph
+repository: https://github.com/zer0-os/ZNS-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,6 +10,7 @@ dataSources:
     source:
       address: "0x0DDdA1dd73C063Af0A8D4Df0CDd2a6818685f9CE"
       abi: Contract
+      startBlock: 9289100
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

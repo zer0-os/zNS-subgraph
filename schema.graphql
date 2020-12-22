@@ -1,6 +1,19 @@
-type ExampleEntity @entity {
+type NewRegistry @entity {
   id: ID!
-  count: BigInt!
-  owner: Bytes! # address
-  approved: Bytes! # address
+  parentID: BigInt!
+  domain: String!
+  owner: Bytes! #address
+  controller: Bytes! #address
+  ref: String!
+  block: BigInt!
+  timestamp: BigInt!
+}
+
+type TransferToken @entity {
+  id: ID!
+  from: Bytes! #address
+  to: Bytes! #address
+  tokenId: BigInt!
+  block: BigInt!
+  timestamp: BigInt!
 }
