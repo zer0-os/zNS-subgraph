@@ -8,9 +8,9 @@ dataSources:
     name: Registrar
     network: rinkeby
     source:
-      address: "0xC845A1a35b10e64d5215b8944324c970a121a66A"
+      address: "0xaa12b1fb88ad3223D717217FdB4AdA5F91a8f67D"
       abi: Registrar
-      startBlock: 7778976
+      startBlock: 7779334
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
