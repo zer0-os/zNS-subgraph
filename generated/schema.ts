@@ -12,7 +12,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class NewRegistry extends Entity {
+export class Domain extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -20,17 +20,17 @@ export class NewRegistry extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save NewRegistry entity without an ID");
+    assert(id !== null, "Cannot save Domain entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save NewRegistry entity with non-string ID. " +
+      "Cannot save Domain entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("NewRegistry", id.toString(), this);
+    store.set("Domain", id.toString(), this);
   }
 
-  static load(id: string): NewRegistry | null {
-    return store.get("NewRegistry", id) as NewRegistry | null;
+  static load(id: string): Domain | null {
+    return store.get("Domain", id) as Domain | null;
   }
 
   get id(): string {
@@ -87,97 +87,12 @@ export class NewRegistry extends Entity {
     this.set("ref", Value.fromString(value));
   }
 
-  get block(): BigInt {
-    let value = this.get("block");
-    return value.toBigInt();
+  get children(): Array<string> {
+    let value = this.get("children");
+    return value.toStringArray();
   }
 
-  set block(value: BigInt) {
-    this.set("block", Value.fromBigInt(value));
-  }
-
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
-  }
-}
-
-export class TransferToken extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save TransferToken entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save TransferToken entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("TransferToken", id.toString(), this);
-  }
-
-  static load(id: string): TransferToken | null {
-    return store.get("TransferToken", id) as TransferToken | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get from(): Bytes {
-    let value = this.get("from");
-    return value.toBytes();
-  }
-
-  set from(value: Bytes) {
-    this.set("from", Value.fromBytes(value));
-  }
-
-  get to(): Bytes {
-    let value = this.get("to");
-    return value.toBytes();
-  }
-
-  set to(value: Bytes) {
-    this.set("to", Value.fromBytes(value));
-  }
-
-  get tokenId(): BigInt {
-    let value = this.get("tokenId");
-    return value.toBigInt();
-  }
-
-  set tokenId(value: BigInt) {
-    this.set("tokenId", Value.fromBigInt(value));
-  }
-
-  get block(): BigInt {
-    let value = this.get("block");
-    return value.toBigInt();
-  }
-
-  set block(value: BigInt) {
-    this.set("block", Value.fromBigInt(value));
-  }
-
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set children(value: Array<string>) {
+    this.set("children", Value.fromStringArray(value));
   }
 }

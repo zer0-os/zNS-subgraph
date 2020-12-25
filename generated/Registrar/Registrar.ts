@@ -79,20 +79,24 @@ export class RegistryCreated__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
+  get tokenId(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
   get domain(): string {
-    return this._event.parameters[1].value.toString();
+    return this._event.parameters[2].value.toString();
   }
 
   get _owner(): Address {
-    return this._event.parameters[2].value.toAddress();
-  }
-
-  get _controller(): Address {
     return this._event.parameters[3].value.toAddress();
   }
 
+  get _controller(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
   get _ref(): string {
-    return this._event.parameters[4].value.toString();
+    return this._event.parameters[5].value.toString();
   }
 }
 
@@ -122,26 +126,55 @@ export class Transfer__Params {
   }
 }
 
-export class Contract__entriesResult {
-  value0: string;
-  value1: Address;
+export class Registrar__entriesResultOutStruct extends ethereum.Tuple {
+  get parent(): BigInt {
+    return this[0].toBigInt();
+  }
 
-  constructor(value0: string, value1: Address) {
+  get ref(): string {
+    return this[1].toString();
+  }
+
+  get domain(): string {
+    return this[2].toString();
+  }
+
+  get controller(): Address {
+    return this[3].toAddress();
+  }
+
+  get owner(): Address {
+    return this[4].toAddress();
+  }
+
+  get children(): Array<BigInt> {
+    return this[5].toBigIntArray();
+  }
+}
+
+export class Registrar__validateDomainResult {
+  value0: boolean;
+  value1: BigInt;
+  value2: string;
+
+  constructor(value0: boolean, value1: BigInt, value2: string) {
     this.value0 = value0;
     this.value1 = value1;
+    this.value2 = value2;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromString(this.value0));
-    map.set("value1", ethereum.Value.fromAddress(this.value1));
+    map.set("value0", ethereum.Value.fromBoolean(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromString(this.value2));
     return map;
   }
 }
 
-export class Contract extends ethereum.SmartContract {
-  static bind(address: Address): Contract {
-    return new Contract("Contract", address);
+export class Registrar extends ethereum.SmartContract {
+  static bind(address: Address): Registrar {
+    return new Registrar("Registrar", address);
   }
 
   balanceOf(owner: Address): BigInt {
@@ -178,27 +211,30 @@ export class Contract extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  entries(param0: BigInt): Contract__entriesResult {
-    let result = super.call("entries", "entries(uint256):(string,address)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
-    ]);
-
-    return new Contract__entriesResult(
-      result[0].toString(),
-      result[1].toAddress()
+  entries(id: BigInt): Registrar__entriesResultOutStruct {
+    let result = super.call(
+      "entries",
+      "entries(uint256):((uint256,string,string,address,address,uint256[]))",
+      [ethereum.Value.fromUnsignedBigInt(id)]
     );
+
+    return result[0].toTuple() as Registrar__entriesResultOutStruct;
   }
 
-  try_entries(param0: BigInt): ethereum.CallResult<Contract__entriesResult> {
-    let result = super.tryCall("entries", "entries(uint256):(string,address)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
-    ]);
+  try_entries(
+    id: BigInt
+  ): ethereum.CallResult<Registrar__entriesResultOutStruct> {
+    let result = super.tryCall(
+      "entries",
+      "entries(uint256):((uint256,string,string,address,address,uint256[]))",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Contract__entriesResult(value[0].toString(), value[1].toAddress())
+      value[0].toTuple() as Registrar__entriesResultOutStruct
     );
   }
 
@@ -431,6 +467,25 @@ export class Contract extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
+  tokenUri(token: BigInt): string {
+    let result = super.call("tokenUri", "tokenUri(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(token)
+    ]);
+
+    return result[0].toString();
+  }
+
+  try_tokenUri(token: BigInt): ethereum.CallResult<string> {
+    let result = super.tryCall("tokenUri", "tokenUri(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(token)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   totalSupply(): BigInt {
     let result = super.call("totalSupply", "totalSupply():(uint256)", []);
 
@@ -444,6 +499,41 @@ export class Contract extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  validateDomain(_s: string): Registrar__validateDomainResult {
+    let result = super.call(
+      "validateDomain",
+      "validateDomain(string):(bool,uint256,string)",
+      [ethereum.Value.fromString(_s)]
+    );
+
+    return new Registrar__validateDomainResult(
+      result[0].toBoolean(),
+      result[1].toBigInt(),
+      result[2].toString()
+    );
+  }
+
+  try_validateDomain(
+    _s: string
+  ): ethereum.CallResult<Registrar__validateDomainResult> {
+    let result = super.tryCall(
+      "validateDomain",
+      "validateDomain(string):(bool,uint256,string)",
+      [ethereum.Value.fromString(_s)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Registrar__validateDomainResult(
+        value[0].toBoolean(),
+        value[1].toBigInt(),
+        value[2].toString()
+      )
+    );
   }
 }
 
@@ -528,24 +618,20 @@ export class CreateRegistryCall__Inputs {
     this._call = call;
   }
 
-  get parentId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
   get domain(): string {
-    return this._call.inputValues[1].value.toString();
+    return this._call.inputValues[0].value.toString();
   }
 
   get _owner(): Address {
-    return this._call.inputValues[2].value.toAddress();
+    return this._call.inputValues[1].value.toAddress();
   }
 
   get _controller(): Address {
-    return this._call.inputValues[3].value.toAddress();
+    return this._call.inputValues[2].value.toAddress();
   }
 
   get _ref(): string {
-    return this._call.inputValues[4].value.toString();
+    return this._call.inputValues[3].value.toString();
   }
 }
 

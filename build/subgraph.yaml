@@ -2,7 +2,7 @@ specVersion: 0.0.2
 description: ZNS subgraph
 repository: https://github.com/zer0-os/ZNS-subgraph
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Registrar
@@ -22,7 +22,7 @@ dataSources:
         - Transfer
       abis:
         - name: Registrar
-          file: ./abis/Registrar.json
+          file: Registrar/abis/Registrar.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
@@ -32,4 +32,4 @@ dataSources:
           handler: handleRegistrarCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: Registrar/Registrar.wasm
