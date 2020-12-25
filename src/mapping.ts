@@ -13,7 +13,9 @@ export function handleRegistrarCreated(event: RegistryCreated): void {
   let registry = new Domain(id);
   let parent = Domain.load(event.params.parentId.toString());
   if(parent) {
-    parent.children = parent.children.concat([event.params.domain]);
+    let children = parent.children;
+    children.push(event.params.domain);
+    parent.children = children;
     parent.save();
   }
   registry.parentID = event.params.parentId;
