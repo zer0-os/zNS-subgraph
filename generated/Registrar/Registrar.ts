@@ -62,16 +62,16 @@ export class ApprovalForAll__Params {
   }
 }
 
-export class RegistryCreated extends ethereum.Event {
-  get params(): RegistryCreated__Params {
-    return new RegistryCreated__Params(this);
+export class DomainCreated extends ethereum.Event {
+  get params(): DomainCreated__Params {
+    return new DomainCreated__Params(this);
   }
 }
 
-export class RegistryCreated__Params {
-  _event: RegistryCreated;
+export class DomainCreated__Params {
+  _event: DomainCreated;
 
-  constructor(event: RegistryCreated) {
+  constructor(event: DomainCreated) {
     this._event = event;
   }
 
@@ -601,20 +601,20 @@ export class ApproveCall__Outputs {
   }
 }
 
-export class CreateRegistryCall extends ethereum.Call {
-  get inputs(): CreateRegistryCall__Inputs {
-    return new CreateRegistryCall__Inputs(this);
+export class CreateDomainCall extends ethereum.Call {
+  get inputs(): CreateDomainCall__Inputs {
+    return new CreateDomainCall__Inputs(this);
   }
 
-  get outputs(): CreateRegistryCall__Outputs {
-    return new CreateRegistryCall__Outputs(this);
+  get outputs(): CreateDomainCall__Outputs {
+    return new CreateDomainCall__Outputs(this);
   }
 }
 
-export class CreateRegistryCall__Inputs {
-  _call: CreateRegistryCall;
+export class CreateDomainCall__Inputs {
+  _call: CreateDomainCall;
 
-  constructor(call: CreateRegistryCall) {
+  constructor(call: CreateDomainCall) {
     this._call = call;
   }
 
@@ -635,10 +635,10 @@ export class CreateRegistryCall__Inputs {
   }
 }
 
-export class CreateRegistryCall__Outputs {
-  _call: CreateRegistryCall;
+export class CreateDomainCall__Outputs {
+  _call: CreateDomainCall;
 
-  constructor(call: CreateRegistryCall) {
+  constructor(call: CreateDomainCall) {
     this._call = call;
   }
 }

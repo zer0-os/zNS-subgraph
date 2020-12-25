@@ -8,9 +8,9 @@ dataSources:
     name: Registrar
     network: rinkeby
     source:
-      address: "0xae9d17a9f1b85BD3664AF3C5c8487e72995b3928"
+      address: "0xC845A1a35b10e64d5215b8944324c970a121a66A"
       abi: Registrar
-      startBlock: 7778173
+      startBlock: 7778976
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -28,8 +28,8 @@ dataSources:
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: RegistryCreated(indexed uint256,uint256,string,address,address,string)
-          handler: handleRegistrarCreated
+        - event: DomainCreated(indexed uint256,uint256,string,address,address,string)
+          handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: Registrar/Registrar.wasm

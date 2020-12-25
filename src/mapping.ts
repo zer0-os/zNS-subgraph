@@ -3,14 +3,14 @@ import {
   Registrar,
   Approval,
   ApprovalForAll,
-  RegistryCreated,
+  DomainCreated,
   Transfer,
 } from "../generated/Registrar/Registrar";
 import { Domain } from "../generated/schema";
 
-export function handleRegistrarCreated(event: RegistryCreated): void {
+export function handleDomainCreated(event: DomainCreated): void {
   let id = event.params.tokenId.toString();
-  let registry = new Domain(id);
+  let domain = new Domain(id);
   let parent = Domain.load(event.params.parentId.toString());
   if(parent) {
     let children = parent.children;
@@ -18,13 +18,13 @@ export function handleRegistrarCreated(event: RegistryCreated): void {
     parent.children = children;
     parent.save();
   }
-  registry.parentID = event.params.parentId;
-  registry.domain = event.params.domain;
-  registry.owner = event.params._owner;
-  registry.controller = event.params._controller;
-  registry.ref = event.params._ref;
-  registry.children = []
-  registry.save();
+  domain.parentID = event.params.parentId;
+  domain.domain = event.params.domain;
+  domain.owner = event.params._owner;
+  domain.controller = event.params._controller;
+  domain.ref = event.params._ref;
+  domain.children = []
+  domain.save();
 }
 
 export function handleApproval(event: Approval): void {}

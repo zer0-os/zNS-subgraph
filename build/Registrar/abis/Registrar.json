@@ -100,7 +100,7 @@
         "type": "string"
       }
     ],
-    "name": "RegistryCreated",
+    "name": "DomainCreated",
     "type": "event"
   },
   {
@@ -201,7 +201,7 @@
         "type": "string"
       }
     ],
-    "name": "createRegistry",
+    "name": "createDomain",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
