@@ -8,7 +8,7 @@ dataSources:
     name: Registrar
     network: rinkeby
     source:
-      address: "0x6707fc1c13137c2Bd596A7d0904bbBF960229a82"
+      address: "0xff3ff705D9906fE78a1434540812081A1ad827D8"
       abi: Registrar
       startBlock: 7797842
     mapping:
