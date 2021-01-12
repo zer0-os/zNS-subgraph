@@ -8,21 +8,3 @@ type Domain @entity {
   ref: String!
   children: [String!]!
 }
-
-type Approval @enity {
-  id: ID!
-  domain: String!
-  owner: Bytes! #address
-  from: Bytes! #address
-  to: Bytes! #address
-}
-
-type Transfer @entity {
-  id: ID!
-  domain: String!
-  blockNumber: Int!
-  transactionID: Bytes!
-  owner: Bytes! #address
-  from: Bytes! #address
-  to: Bytes! #address
-}
