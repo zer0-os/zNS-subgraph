@@ -4,7 +4,6 @@ type Domain @entity {
   domain: String!
   owner: Bytes! #address
   controller: Bytes! #address
-  approval: Bytes! #address
   ref: String!
   children: [String!]!
 }
