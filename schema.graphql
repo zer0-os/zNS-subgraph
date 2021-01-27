@@ -1,9 +1,20 @@
 type Domain @entity {
   id: ID!
-  parentID: BigInt!
+  parent: BigInt!
   domain: String!
   owner: Bytes! #address
   controller: Bytes! #address
+  approval: Bytes
   ref: String!
-  children: [String!]!
+}
+
+
+type Transfer @entity {
+  id: ID!
+  domain: String!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Bytes! #address
+  from: Bytes! #address
+  to: Bytes! #address
 }
