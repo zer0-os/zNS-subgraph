@@ -1,21 +1,13 @@
 type Domain @entity {
   id: ID!
-  parentID: BigInt!
+  parent: BigInt!
   domain: String!
   owner: Bytes! #address
   controller: Bytes! #address
   approval: Bytes
   ref: String!
-  children: [String!]!
 }
 
-type Approval @entity {
-  id: ID!
-  domain: String!
-  owner: Bytes! #address
-  from: Bytes! #address
-  to: Bytes! #address
-}
 
 type Transfer @entity {
   id: ID!

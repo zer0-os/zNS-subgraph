@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   Registrar,
   Approval,
@@ -8,26 +8,29 @@ import {
 } from "../generated/Registrar/Registrar";
 import { Domain } from "../generated/schema";
 
+const zeroAddress = Bytes.fromHexString(
+  "0x0000000000000000000000000000000000000000000000000000000000000000"
+) as Bytes;
+
 export function handleDomainCreated(event: DomainCreated): void {
   let id = event.params.tokenId.toString();
   let domain = new Domain(id);
-  let parent = Domain.load(event.params.parentId.toString());
-  if(parent) {
-    let children = parent.children;
-    children.push(event.params.domain);
-    parent.children = children;
-    parent.save();
-  }
-  domain.parentID = event.params.parentId;
+  domain.parent = event.params.parentId;
   domain.domain = event.params.domain;
   domain.owner = event.params._owner;
   domain.controller = event.params._controller;
   domain.ref = event.params._ref;
-  domain.children = []
+  domain.approval = null;
   domain.save();
 }
 
-export function handleApproval(event: Approval): void {}
+export function handleApproval(event: Approval): void {
+  let domain = Domain.load(event.params.tokenId.toString());
+  domain.approval = event.params.approved.equals(zeroAddress)
+    ? null
+    : event.params.approved;
+  domain.save();
+}
 
 export function handleApprovalForAll(event: ApprovalForAll): void {}
 
