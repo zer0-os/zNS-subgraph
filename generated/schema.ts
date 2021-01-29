@@ -78,6 +78,15 @@ export class Domain extends Entity {
     this.set("controller", Value.fromBytes(value));
   }
 
+  get registrar(): Bytes {
+    let value = this.get("registrar");
+    return value.toBytes();
+  }
+
+  set registrar(value: Bytes) {
+    this.set("registrar", Value.fromBytes(value));
+  }
+
   get approval(): Bytes | null {
     let value = this.get("approval");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -95,13 +104,22 @@ export class Domain extends Entity {
     }
   }
 
-  get ref(): string {
-    let value = this.get("ref");
+  get image(): string {
+    let value = this.get("image");
     return value.toString();
   }
 
-  set ref(value: string) {
-    this.set("ref", Value.fromString(value));
+  set image(value: string) {
+    this.set("image", Value.fromString(value));
+  }
+
+  get resolver(): string {
+    let value = this.get("resolver");
+    return value.toString();
+  }
+
+  set resolver(value: string) {
+    this.set("resolver", Value.fromString(value));
   }
 }
 

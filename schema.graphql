@@ -4,8 +4,10 @@ type Domain @entity {
   domain: String!
   owner: Bytes! #address
   controller: Bytes! #address
+  registrar: Bytes! #address
   approval: Bytes
-  ref: String!
+  image: String!
+  resolver: String!
 }
 
 

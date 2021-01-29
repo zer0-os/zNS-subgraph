@@ -1,11 +1,10 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
-  Registrar,
   Approval,
   ApprovalForAll,
   DomainCreated,
-  Transfer,
-} from "../generated/Registrar/Registrar";
+  Transfer
+} from "../generated/Registry/Registry";
 import { Domain } from "../generated/schema";
 
 const zeroAddress = Bytes.fromHexString(
@@ -17,9 +16,10 @@ export function handleDomainCreated(event: DomainCreated): void {
   let domain = new Domain(id);
   domain.parent = event.params.parentId;
   domain.domain = event.params.domain;
-  domain.owner = event.params._owner;
-  domain.controller = event.params._controller;
-  domain.ref = event.params._ref;
+  domain.owner = event.params.owner;
+  domain.controller = event.params.controller;
+  domain.resolver = event.params.resolver;
+  domain.image = event.params.image;
   domain.approval = null;
   domain.save();
 }

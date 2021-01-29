@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Registrar
+    name: Registry
     network: rinkeby
     source:
       address: "0xff3ff705D9906fE78a1434540812081A1ad827D8"
-      abi: Registrar
+      abi: Registry
       startBlock: 7798068
     mapping:
       kind: ethereum/events
@@ -18,17 +18,17 @@ dataSources:
       entities:
         - Approval
         - ApprovalForAll
-        - RegistrarCreated
+        - RegistryCreated
         - Transfer
       abis:
-        - name: Registrar
-          file: ./abis/Registrar.json
+        - name: Registry
+          file: ./abis/Registry.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: DomainCreated(indexed uint256,uint256,string,address,address,string)
+        - event: DomainCreated(indexed uint256,uint256,string,address,address,string,string)
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
