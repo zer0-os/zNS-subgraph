@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ zer0-os/ZNS-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ zer0-os/ZNS-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ zer0-os/ZNS-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 zer0-os/ZNS-subgraph"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ zer0-os/zns",
+    "create-local": "graph create --node http://localhost:8020/ zer0-os/zns",
+    "remove-local": "graph remove --node http://localhost:8020/ zer0-os/zns",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 zer0-os/zns"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.19.0",

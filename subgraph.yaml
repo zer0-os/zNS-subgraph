@@ -8,9 +8,9 @@ dataSources:
     name: Registry
     network: rinkeby
     source:
-      address: "0xff3ff705D9906fE78a1434540812081A1ad827D8"
+      address: "0x798190f0640E6089b481298FbAc7EAEC0CFFBEFb"
       abi: Registry
-      startBlock: 7798068
+      startBlock: 7982879
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -32,4 +32,7 @@ dataSources:
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: ImageSet(indexed address,indexed uint256,string)
+          handler: handleImageSet
+
       file: ./src/mapping.ts

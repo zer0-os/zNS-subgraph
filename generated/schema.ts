@@ -78,15 +78,6 @@ export class Domain extends Entity {
     this.set("controller", Value.fromBytes(value));
   }
 
-  get registrar(): Bytes {
-    let value = this.get("registrar");
-    return value.toBytes();
-  }
-
-  set registrar(value: Bytes) {
-    this.set("registrar", Value.fromBytes(value));
-  }
-
   get approval(): Bytes | null {
     let value = this.get("approval");
     if (value === null || value.kind == ValueKind.NULL) {

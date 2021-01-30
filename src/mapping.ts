@@ -3,7 +3,8 @@ import {
   Approval,
   ApprovalForAll,
   DomainCreated,
-  Transfer
+  Transfer,
+  ImageSet
 } from "../generated/Registry/Registry";
 import { Domain } from "../generated/schema";
 
@@ -41,4 +42,11 @@ export function handleTransfer(event: Transfer): void {
     domain.owner = event.params.to;
     domain.save();
   }
+}
+
+export function handleImageSet(event: ImageSet): void {
+  let id = event.params.id.toString();
+  let domain = Domain.load(id);
+  domain.image = event.params.image;
+  domain.save();
 }
