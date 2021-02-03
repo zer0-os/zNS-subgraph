@@ -112,6 +112,15 @@ export class Domain extends Entity {
   set resolver(value: string) {
     this.set("resolver", Value.fromString(value));
   }
+
+  get timeCreated(): BigInt {
+    let value = this.get("timeCreated");
+    return value.toBigInt();
+  }
+
+  set timeCreated(value: BigInt) {
+    this.set("timeCreated", Value.fromBigInt(value));
+  }
 }
 
 export class Transfer extends Entity {
