@@ -22,6 +22,7 @@ export function handleDomainCreated(event: DomainCreated): void {
   domain.resolver = event.params.resolver;
   domain.image = event.params.image;
   domain.approval = null;
+  domain.timeCreated = event.block.timestamp.toI32();
   domain.save();
 }
 

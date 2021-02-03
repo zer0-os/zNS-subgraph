@@ -113,13 +113,13 @@ export class Domain extends Entity {
     this.set("resolver", Value.fromString(value));
   }
 
-  get timeCreated(): BigInt {
+  get timeCreated(): i32 {
     let value = this.get("timeCreated");
-    return value.toBigInt();
+    return value.toI32();
   }
 
-  set timeCreated(value: BigInt) {
-    this.set("timeCreated", Value.fromBigInt(value));
+  set timeCreated(value: i32) {
+    this.set("timeCreated", Value.fromI32(value));
   }
 }
 
