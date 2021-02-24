@@ -51,22 +51,13 @@ export class Domain extends Entity {
     this.set("parent", Value.fromBigInt(value));
   }
 
-  get domain(): string {
-    let value = this.get("domain");
-    return value.toString();
+  get depth(): BigInt {
+    let value = this.get("depth");
+    return value.toBigInt();
   }
 
-  set domain(value: string) {
-    this.set("domain", Value.fromString(value));
-  }
-
-  get owner(): Bytes {
-    let value = this.get("owner");
-    return value.toBytes();
-  }
-
-  set owner(value: Bytes) {
-    this.set("owner", Value.fromBytes(value));
+  set depth(value: BigInt) {
+    this.set("depth", Value.fromBigInt(value));
   }
 
   get controller(): Bytes {
@@ -76,6 +67,87 @@ export class Domain extends Entity {
 
   set controller(value: Bytes) {
     this.set("controller", Value.fromBytes(value));
+  }
+
+  get creator(): Bytes {
+    let value = this.get("creator");
+    return value.toBytes();
+  }
+
+  set creator(value: Bytes) {
+    this.set("creator", Value.fromBytes(value));
+  }
+
+  get name(): string {
+    let value = this.get("name");
+    return value.toString();
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
+  }
+
+  get domain(): string {
+    let value = this.get("domain");
+    return value.toString();
+  }
+
+  set domain(value: string) {
+    this.set("domain", Value.fromString(value));
+  }
+
+  get properties(): string {
+    let value = this.get("properties");
+    return value.toString();
+  }
+
+  set properties(value: string) {
+    this.set("properties", Value.fromString(value));
+  }
+
+  get lockableProperties(): string {
+    let value = this.get("lockableProperties");
+    return value.toString();
+  }
+
+  set lockableProperties(value: string) {
+    this.set("lockableProperties", Value.fromString(value));
+  }
+
+  get childCreateLimit(): BigInt {
+    let value = this.get("childCreateLimit");
+    return value.toBigInt();
+  }
+
+  set childCreateLimit(value: BigInt) {
+    this.set("childCreateLimit", Value.fromBigInt(value));
+  }
+
+  get childPropertiesRule(): i32 {
+    let value = this.get("childPropertiesRule");
+    return value.toI32();
+  }
+
+  set childPropertiesRule(value: i32) {
+    this.set("childPropertiesRule", Value.fromI32(value));
+  }
+
+  get childCount(): BigInt {
+    let value = this.get("childCount");
+    return value.toBigInt();
+  }
+
+  set childCount(value: BigInt) {
+    this.set("childCount", Value.fromBigInt(value));
+  }
+
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
   }
 
   get approval(): Bytes | null {
@@ -93,24 +165,6 @@ export class Domain extends Entity {
     } else {
       this.set("approval", Value.fromBytes(value as Bytes));
     }
-  }
-
-  get image(): string {
-    let value = this.get("image");
-    return value.toString();
-  }
-
-  set image(value: string) {
-    this.set("image", Value.fromString(value));
-  }
-
-  get resolver(): string {
-    let value = this.get("resolver");
-    return value.toString();
-  }
-
-  set resolver(value: string) {
-    this.set("resolver", Value.fromString(value));
   }
 
   get timeCreated(): i32 {

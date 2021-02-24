@@ -5,34 +5,39 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Registry
+    name: ZNSRegistry
     network: rinkeby
     source:
       address: "0x798190f0640E6089b481298FbAc7EAEC0CFFBEFb"
-      abi: Registry
+      abi: ZNSRegistry
       startBlock: 7982879
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - RegistryCreated
-        - Transfer
+        - Domain
       abis:
-        - name: Registry
-          file: ./abis/Registry.json
+        - name: ZNSRegistry
+          file: ./abis/ZNSRegistry.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: DomainCreated(indexed uint256,uint256,string,address,address,string,string)
+        - event: DomainCreated(indexed address,indexed uint256,uint256,string)
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: ImageSet(indexed address,indexed uint256,string)
-          handler: handleImageSet
+        - event: LockablePropertiesSet(indexed address,indexed uint256,string)
+          handler: handleLockablePropertiesSet
+        - event: ChildCreateLimitSet(indexed address,indexed uint256,uint256)
+          handler: handleChildCreateLimitSet
+        - event: PropertiesSet(indexed address,indexed uint256,string)
+          handler: handlePropertiesSet
+        - event: ControllerSet(indexed uint256,indexed address,indexed address,address)
+          handler: handleControllerSet
+        - event: ChildLockablePropertiesRuleSet(indexed address,indexed uint256,uint8)
+          handler: handleChildLockablePropertiesRuleSet
 
       file: ./src/mapping.ts

@@ -1,15 +1,20 @@
 type Domain @entity {
   id: ID!
   parent: BigInt!
-  domain: String!
-  owner: Bytes! #address
+  depth: BigInt!
   controller: Bytes! #address
+  creator: Bytes! #address
+  name: String!
+  domain: String!
+  properties: String!
+  lockableProperties: String!
+  childCreateLimit: BigInt!
+  childPropertiesRule: Int!
+  childCount: BigInt!
+  owner: Bytes! #address
   approval: Bytes
-  image: String!
-  resolver: String!
   timeCreated: Int!
 }
-
 
 type Transfer @entity {
   id: ID!
