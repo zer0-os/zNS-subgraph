@@ -1,4 +1,4 @@
-import { BigInt, Bytes, crypto } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import {
   Approval,
   ApprovalForAll,
@@ -11,38 +11,27 @@ import {
   ChildLockablePropertiesRuleSet
 } from "../generated/ZNSRegistry/ZNSRegistry";
 import { Domain } from "../generated/schema";
-
-const zeroAddress = Bytes.fromHexString(
-  "0x0000000000000000000000000000000000000000000000000000000000000000"
-) as Bytes;
-
-/*
-const ROOT_ID_HASH = crypto.keccak256(
-  coder.encode(["uint256", "string"], [zeroBytes32, "ROOT"])
-);
-
-const ROOT_ID = BigNumber.from(ROOT_ID_HASH.toString()).toString();
-
-function calcId(_domain: string): string {
-  if (_domain === "ROOT") {
-    return ROOT_ID;
-  }
-  const domains = _domain.split(".");
-  let hash = ROOT_ID_HASH;
-  for (const domain of domains) {
-    hash = keccak256(coder.encode(["uint256", "string"], [hash, domain]));
-  }
-  return BigNumber.from(hash).toString();
-}
-*/
+import { ROOT_ID_BIGINT, zeroAddress } from "./utils"
 
 export function handleDomainCreated(event: DomainCreated): void {
-  let id = event.params.tokenId.toString();
-  let domain = new Domain(id);
+  let id = event.params.tokenId;
+  let parentId = event.params.parentId;
+  let domain = new Domain(id.toString());
   domain.parent = event.params.parentId;
   domain.name = event.params.name;
   domain.owner = event.params.owner;
   domain.timeCreated = event.block.timestamp.toI32();
+  log.info("domain name", [domain.name]);
+  if (id.equals(ROOT_ID_BIGINT)) {
+    domain.domain = event.params.name;
+  } else if (parentId.equals(ROOT_ID_BIGINT)) {
+    domain.domain = event.params.name;
+  } else {
+    let parent = Domain.load(parentId.toString());
+    log.info("parent name", [parent.name]);
+    domain.domain = parent.domain + "." + event.params.name;
+  }
+  log.info("domain created", [domain.domain]);
   domain.save();
 }
 
@@ -65,7 +54,9 @@ export function handleTransfer(event: Transfer): void {
   }
 }
 
-export function handleLockablePropertiesSet(event: LockablePropertiesSet): void {
+export function handleLockablePropertiesSet(
+  event: LockablePropertiesSet
+): void {
   let id = event.params.id.toString();
   let domain = Domain.load(id);
   domain.lockableProperties = event.params.lockableProperties;
@@ -76,7 +67,7 @@ export function handleChildCreateLimitSet(event: ChildCreateLimitSet): void {
   let id = event.params.id.toString();
   let domain = Domain.load(id);
   domain.childCreateLimit = event.params.childCreateLimit;
-  domain.save()
+  domain.save();
 }
 
 export function handlePropertiesSet(event: PropertiesSet): void {
@@ -93,7 +84,9 @@ export function handleController(event: ControllerSet): void {
   domain.save();
 }
 
-export function handleChildPropertiesRuleSet(event: ChildLockablePropertiesRuleSet): void {
+export function handleChildPropertiesRuleSet(
+  event: ChildLockablePropertiesRuleSet
+): void {
   let id = event.params.id.toString();
   let domain = Domain.load(id);
   domain.childPropertiesRule = event.params.rule;

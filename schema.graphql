@@ -16,6 +16,31 @@ type Domain @entity {
   timeCreated: Int!
 }
 
+type StakingDomainConfig @entity {
+  id: ID! #tokenId
+  stakeToken: Bytes! #address
+  minBid: BigInt!
+}
+
+type Stake @entity {
+  id: ID! #stakeHash
+  status: String!
+  parentId: BigInt! #address
+  name: String!
+  amount: BigInt!
+  controller: Bytes! #address
+  controllerData: Bytes!
+  lockableProperties: String!
+  stakeToken: Bytes! #address
+  domain: String!
+}
+
+type DynamicToken @entity {
+  id: ID!
+  dsToken: Bytes! #address
+  converter: Bytes! #address
+}
+
 type Transfer @entity {
   id: ID!
   domain: String!

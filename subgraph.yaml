@@ -40,4 +40,86 @@ dataSources:
         - event: ChildLockablePropertiesRuleSet(indexed address,indexed uint256,uint8)
           handler: handleChildLockablePropertiesRuleSet
 
-      file: ./src/mapping.ts
+      file: ./src/registry.ts
+  - kind: ethereum/contract
+    name: StakingController
+    network: rinkeby
+    source:
+      address: "0x798190f0640E6089b481298FbAc7EAEC0CFFBEFb"
+      abi: StakingController
+      startBlock: 7982879
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Domain
+        - StakingDomainConfig
+        - Stake
+      abis:
+        - name: StakingController
+          file: ./abis/StakingController.json
+      eventHandlers:
+        - event: StakeTokenSet(indexed uint256,indexed address)
+          handler: handleStakeTokenSet
+        - event: MinBidSet(indexed uint256,uint256)
+          handler: handleMinBidSet
+        - event: BidAccepted(indexed address,indexed uint256)
+          handler: handleBidAccepted
+        - event: BidClaimed(address,indexed address,indexed uint256,indexed address)
+          handler: handleBidClaimed
+        - event: Bid(indexed address,indexed address,indexed uint256,string,(bytes,string),string,uint256)
+          handler: handleBid
+      file: ./src/controllers/staking.ts
+  - kind: ethereum/contract
+    name: DynamicTokenController
+    network: rinkeby
+    source:
+      address: "0x798190f0640E6089b481298FbAc7EAEC0CFFBEFb"
+      abi: DynamicTokenController
+      startBlock: 7982879
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DynamicTokenAddresses
+      abis:
+        - name: DynamicTokenController
+          file: ./abis/DynamicTokenController.json
+      eventHandlers:
+        - event: DynamicTokenCreated(indexed uint256,indexed address,address,address)
+          handler: handleDynamicTokenCreated
+        - event: DynamicConverterUpgraded(indexed uint256,indexed address,indexed address,address,address)
+          handler: handleDynamicConverterUpgraded
+      file: ./src/controllers/staking.ts
+      templates:
+  - kind: ethereum/contract
+    name: DynamicLiquidTokenConverter
+    network: rinkeby
+    source:
+      abi: DynamicLiquidTokenConverter
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings/core.ts
+      entities:
+        - DynamicLiquidTokenConverter
+        - Token
+      abis:
+        - name: DynamicLiquidTokenConverter
+          file: ./abis/DynamicLiquidTokenConverter.json
+        - name: Factory
+          file: ./abis/factory.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
