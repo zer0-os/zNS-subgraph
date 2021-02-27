@@ -6,10 +6,10 @@ type Domain @entity {
   creator: Bytes! #address
   name: String!
   domain: String!
-  properties: String!
-  lockableProperties: String!
+  properties: String
+  lockableProperties: String
   childCreateLimit: BigInt!
-  childPropertiesRule: Int!
+  childPropertiesRule: String
   childCount: BigInt!
   owner: Bytes! #address
   approval: Bytes
@@ -39,6 +39,9 @@ type DynamicToken @entity {
   id: ID!
   dsToken: Bytes! #address
   converter: Bytes! #address
+  reserves: BigInt!
+  totalSupply: BigInt!
+  
 }
 
 type Transfer @entity {

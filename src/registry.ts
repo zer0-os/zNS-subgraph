@@ -20,6 +20,7 @@ export function handleDomainCreated(event: DomainCreated): void {
   domain.parent = event.params.parentId;
   domain.name = event.params.name;
   domain.owner = event.params.owner;
+  domain.creator = event.params.owner;
   domain.timeCreated = event.block.timestamp.toI32();
   log.info("domain name", [domain.name]);
   if (id.equals(ROOT_ID_BIGINT)) {

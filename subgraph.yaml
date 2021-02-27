@@ -93,7 +93,7 @@ dataSources:
         - event: DynamicConverterUpgraded(indexed uint256,indexed address,indexed address,address,address)
           handler: handleDynamicConverterUpgraded
       file: ./src/controllers/staking.ts
-      templates:
+templates:
   - kind: ethereum/contract
     name: DynamicLiquidTokenConverter
     network: rinkeby
@@ -105,21 +105,10 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/core.ts
       entities:
-        - DynamicLiquidTokenConverter
-        - Token
+        - DynamicToken
       abis:
         - name: DynamicLiquidTokenConverter
           file: ./abis/DynamicLiquidTokenConverter.json
         - name: Factory
           file: ./abis/factory.json
       eventHandlers:
-        - event: Mint(indexed address,uint256,uint256)
-          handler: handleMint
-        - event: Burn(indexed address,uint256,uint256,indexed address)
-          handler: handleBurn
-        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
-          handler: handleSwap
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: Sync(uint112,uint112)
-          handler: handleSync

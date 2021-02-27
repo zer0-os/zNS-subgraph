@@ -31,7 +31,7 @@ function _getDomainHash(parentId: ByteArray, name: string) {
 
 export function getDomainHash(parentId: BigInt, name: string) {
   return crypto.keccak256(
-    concat(BigIntToBytes32(parentId), ByteArray.fromUTF8("ROOT"))
+    concat(BigIntToBytes32(parentId), ByteArray.fromUTF8(name))
   );
 }
 
