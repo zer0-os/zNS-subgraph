@@ -42,116 +42,42 @@ export class Domain extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get parent(): BigInt {
-    let value = this.get("parent");
-    return value.toBigInt();
-  }
-
-  set parent(value: BigInt) {
-    this.set("parent", Value.fromBigInt(value));
-  }
-
-  get depth(): BigInt {
-    let value = this.get("depth");
-    return value.toBigInt();
-  }
-
-  set depth(value: BigInt) {
-    this.set("depth", Value.fromBigInt(value));
-  }
-
-  get controller(): Bytes {
-    let value = this.get("controller");
-    return value.toBytes();
-  }
-
-  set controller(value: Bytes) {
-    this.set("controller", Value.fromBytes(value));
-  }
-
-  get creator(): Bytes {
-    let value = this.get("creator");
-    return value.toBytes();
-  }
-
-  set creator(value: Bytes) {
-    this.set("creator", Value.fromBytes(value));
-  }
-
-  get name(): string {
+  get name(): string | null {
     let value = this.get("name");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set name(value: string) {
-    this.set("name", Value.fromString(value));
+  set name(value: string | null) {
+    if (value === null) {
+      this.unset("name");
+    } else {
+      this.set("name", Value.fromString(value as string));
+    }
   }
 
-  get domain(): string {
-    let value = this.get("domain");
-    return value.toString();
+  get labelName(): string | null {
+    let value = this.get("labelName");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set domain(value: string) {
-    this.set("domain", Value.fromString(value));
+  set labelName(value: string | null) {
+    if (value === null) {
+      this.unset("labelName");
+    } else {
+      this.set("labelName", Value.fromString(value as string));
+    }
   }
 
-  get properties(): string {
-    let value = this.get("properties");
-    return value.toString();
-  }
-
-  set properties(value: string) {
-    this.set("properties", Value.fromString(value));
-  }
-
-  get lockableProperties(): string {
-    let value = this.get("lockableProperties");
-    return value.toString();
-  }
-
-  set lockableProperties(value: string) {
-    this.set("lockableProperties", Value.fromString(value));
-  }
-
-  get childCreateLimit(): BigInt {
-    let value = this.get("childCreateLimit");
-    return value.toBigInt();
-  }
-
-  set childCreateLimit(value: BigInt) {
-    this.set("childCreateLimit", Value.fromBigInt(value));
-  }
-
-  get childPropertiesRule(): i32 {
-    let value = this.get("childPropertiesRule");
-    return value.toI32();
-  }
-
-  set childPropertiesRule(value: i32) {
-    this.set("childPropertiesRule", Value.fromI32(value));
-  }
-
-  get childCount(): BigInt {
-    let value = this.get("childCount");
-    return value.toBigInt();
-  }
-
-  set childCount(value: BigInt) {
-    this.set("childCount", Value.fromBigInt(value));
-  }
-
-  get owner(): Bytes {
-    let value = this.get("owner");
-    return value.toBytes();
-  }
-
-  set owner(value: Bytes) {
-    this.set("owner", Value.fromBytes(value));
-  }
-
-  get approval(): Bytes | null {
-    let value = this.get("approval");
+  get labelHash(): Bytes | null {
+    let value = this.get("labelHash");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -159,237 +85,65 @@ export class Domain extends Entity {
     }
   }
 
-  set approval(value: Bytes | null) {
+  set labelHash(value: Bytes | null) {
     if (value === null) {
-      this.unset("approval");
+      this.unset("labelHash");
     } else {
-      this.set("approval", Value.fromBytes(value as Bytes));
+      this.set("labelHash", Value.fromBytes(value as Bytes));
     }
   }
 
-  get timeCreated(): i32 {
-    let value = this.get("timeCreated");
-    return value.toI32();
+  get parent(): string | null {
+    let value = this.get("parent");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set timeCreated(value: i32) {
-    this.set("timeCreated", Value.fromI32(value));
-  }
-}
-
-export class StakingDomainConfig extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
+  set parent(value: string | null) {
+    if (value === null) {
+      this.unset("parent");
+    } else {
+      this.set("parent", Value.fromString(value as string));
+    }
   }
 
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save StakingDomainConfig entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save StakingDomainConfig entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("StakingDomainConfig", id.toString(), this);
+  get subdomains(): Array<string | null> {
+    let value = this.get("subdomains");
+    return value.toStringArray();
   }
 
-  static load(id: string): StakingDomainConfig | null {
-    return store.get("StakingDomainConfig", id) as StakingDomainConfig | null;
+  set subdomains(value: Array<string | null>) {
+    this.set("subdomains", Value.fromStringArray(value));
   }
 
-  get id(): string {
-    let value = this.get("id");
+  get owner(): string {
+    let value = this.get("owner");
     return value.toString();
   }
 
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
   }
 
-  get stakeToken(): Bytes {
-    let value = this.get("stakeToken");
-    return value.toBytes();
-  }
-
-  set stakeToken(value: Bytes) {
-    this.set("stakeToken", Value.fromBytes(value));
-  }
-
-  get minBid(): BigInt {
-    let value = this.get("minBid");
-    return value.toBigInt();
-  }
-
-  set minBid(value: BigInt) {
-    this.set("minBid", Value.fromBigInt(value));
-  }
-}
-
-export class Stake extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Stake entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Stake entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Stake", id.toString(), this);
-  }
-
-  static load(id: string): Stake | null {
-    return store.get("Stake", id) as Stake | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
+  get creator(): string {
+    let value = this.get("creator");
     return value.toString();
   }
 
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
+  set creator(value: string) {
+    this.set("creator", Value.fromString(value));
   }
 
-  get status(): string {
-    let value = this.get("status");
-    return value.toString();
+  get events(): Array<string> {
+    let value = this.get("events");
+    return value.toStringArray();
   }
 
-  set status(value: string) {
-    this.set("status", Value.fromString(value));
-  }
-
-  get parentId(): BigInt {
-    let value = this.get("parentId");
-    return value.toBigInt();
-  }
-
-  set parentId(value: BigInt) {
-    this.set("parentId", Value.fromBigInt(value));
-  }
-
-  get name(): string {
-    let value = this.get("name");
-    return value.toString();
-  }
-
-  set name(value: string) {
-    this.set("name", Value.fromString(value));
-  }
-
-  get amount(): BigInt {
-    let value = this.get("amount");
-    return value.toBigInt();
-  }
-
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
-  }
-
-  get controller(): Bytes {
-    let value = this.get("controller");
-    return value.toBytes();
-  }
-
-  set controller(value: Bytes) {
-    this.set("controller", Value.fromBytes(value));
-  }
-
-  get controllerData(): Bytes {
-    let value = this.get("controllerData");
-    return value.toBytes();
-  }
-
-  set controllerData(value: Bytes) {
-    this.set("controllerData", Value.fromBytes(value));
-  }
-
-  get lockableProperties(): string {
-    let value = this.get("lockableProperties");
-    return value.toString();
-  }
-
-  set lockableProperties(value: string) {
-    this.set("lockableProperties", Value.fromString(value));
-  }
-
-  get stakeToken(): Bytes {
-    let value = this.get("stakeToken");
-    return value.toBytes();
-  }
-
-  set stakeToken(value: Bytes) {
-    this.set("stakeToken", Value.fromBytes(value));
-  }
-
-  get domain(): string {
-    let value = this.get("domain");
-    return value.toString();
-  }
-
-  set domain(value: string) {
-    this.set("domain", Value.fromString(value));
-  }
-}
-
-export class DynamicTokenAddresses extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(
-      id !== null,
-      "Cannot save DynamicTokenAddresses entity without an ID"
-    );
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save DynamicTokenAddresses entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("DynamicTokenAddresses", id.toString(), this);
-  }
-
-  static load(id: string): DynamicTokenAddresses | null {
-    return store.get(
-      "DynamicTokenAddresses",
-      id
-    ) as DynamicTokenAddresses | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get dsToken(): Bytes {
-    let value = this.get("dsToken");
-    return value.toBytes();
-  }
-
-  set dsToken(value: Bytes) {
-    this.set("dsToken", Value.fromBytes(value));
-  }
-
-  get converter(): Bytes {
-    let value = this.get("converter");
-    return value.toBytes();
-  }
-
-  set converter(value: Bytes) {
-    this.set("converter", Value.fromBytes(value));
+  set events(value: Array<string>) {
+    this.set("events", Value.fromStringArray(value));
   }
 }
 
@@ -450,30 +204,119 @@ export class Transfer extends Entity {
     this.set("transactionID", Value.fromBytes(value));
   }
 
-  get owner(): Bytes {
+  get owner(): string {
     let value = this.get("owner");
+    return value.toString();
+  }
+
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
+  }
+}
+
+export class NewOwner extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save NewOwner entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save NewOwner entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("NewOwner", id.toString(), this);
+  }
+
+  static load(id: string): NewOwner | null {
+    return store.get("NewOwner", id) as NewOwner | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get domain(): string {
+    let value = this.get("domain");
+    return value.toString();
+  }
+
+  set domain(value: string) {
+    this.set("domain", Value.fromString(value));
+  }
+
+  get blockNumber(): i32 {
+    let value = this.get("blockNumber");
+    return value.toI32();
+  }
+
+  set blockNumber(value: i32) {
+    this.set("blockNumber", Value.fromI32(value));
+  }
+
+  get transactionID(): Bytes {
+    let value = this.get("transactionID");
     return value.toBytes();
   }
 
-  set owner(value: Bytes) {
-    this.set("owner", Value.fromBytes(value));
+  set transactionID(value: Bytes) {
+    this.set("transactionID", Value.fromBytes(value));
   }
 
-  get from(): Bytes {
-    let value = this.get("from");
-    return value.toBytes();
+  get owner(): string {
+    let value = this.get("owner");
+    return value.toString();
   }
 
-  set from(value: Bytes) {
-    this.set("from", Value.fromBytes(value));
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
+  }
+}
+
+export class Account extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
   }
 
-  get to(): Bytes {
-    let value = this.get("to");
-    return value.toBytes();
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Account entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Account entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Account", id.toString(), this);
   }
 
-  set to(value: Bytes) {
-    this.set("to", Value.fromBytes(value));
+  static load(id: string): Account | null {
+    return store.get("Account", id) as Account | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get domains(): Array<string> {
+    let value = this.get("domains");
+    return value.toStringArray();
+  }
+
+  set domains(value: Array<string>) {
+    this.set("domains", Value.fromStringArray(value));
   }
 }

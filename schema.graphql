@@ -1,55 +1,33 @@
+
+
 type Domain @entity {
   id: ID!
-  parent: BigInt!
-  depth: BigInt!
-  controller: Bytes! #address
-  creator: Bytes! #address
-  name: String!
-  domain: String!
-  properties: String
-  lockableProperties: String
-  childCreateLimit: BigInt!
-  childPropertiesRule: String
-  childCount: BigInt!
-  owner: Bytes! #address
-  approval: Bytes
-  timeCreated: Int!
+  name: String
+  labelName: String
+  labelHash: Bytes
+  parent: Domain
+  subdomains: [Domain]!
+  owner: Account!
+  creator: Account!
+  events: [DomainEvent!]!
+}
+interface DomainEvent {
+  id: ID!#should this be the same ID as the domain?
+  domain: Domain!
+  blockNumber: Int!
+  transactionId: Bytes!
 }
 
-type StakingDomainConfig @entity {
-  id: ID! #tokenId
-  stakeToken: Bytes! #address
-  minBid: BigInt!
-}
-
-type Stake @entity {
-  id: ID! #stakeHash
-  status: String!
-  parentId: BigInt! #address
-  name: String!
-  amount: BigInt!
-  controller: Bytes! #address
-  controllerData: Bytes!
-  lockableProperties: String!
-  stakeToken: Bytes! #address
-  domain: String!
-}
-
-type DynamicToken @entity {
+type Transfer implements DomainEvent @entity {
   id: ID!
-  dsToken: Bytes! #address
-  converter: Bytes! #address
-  reserves: BigInt!
-  totalSupply: BigInt!
-  
-}
-
-type Transfer @entity {
-  id: ID!
-  domain: String!
+  domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
-  owner: Bytes! #address
-  from: Bytes! #address
-  to: Bytes! #address
+  owner: Account!
+}
+
+
+type Account @entity {
+  id: ID!
+  domains: [Domain!]! @derivedFrom(field: "owner")
 }
