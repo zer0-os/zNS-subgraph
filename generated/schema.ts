@@ -76,20 +76,20 @@ export class Domain extends Entity {
     }
   }
 
-  get labelHash(): Bytes | null {
+  get labelHash(): string | null {
     let value = this.get("labelHash");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set labelHash(value: Bytes | null) {
+  set labelHash(value: string | null) {
     if (value === null) {
       this.unset("labelHash");
     } else {
-      this.set("labelHash", Value.fromBytes(value as Bytes));
+      this.set("labelHash", Value.fromString(value as string));
     }
   }
 
@@ -119,13 +119,21 @@ export class Domain extends Entity {
     this.set("subdomains", Value.fromStringArray(value));
   }
 
-  get owner(): string {
+  get owner(): string | null {
     let value = this.get("owner");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set owner(value: string) {
-    this.set("owner", Value.fromString(value));
+  set owner(value: string | null) {
+    if (value === null) {
+      this.unset("owner");
+    } else {
+      this.set("owner", Value.fromString(value as string));
+    }
   }
 
   get creator(): string {
@@ -135,6 +143,15 @@ export class Domain extends Entity {
 
   set creator(value: string) {
     this.set("creator", Value.fromString(value));
+  }
+
+  get transactionId(): Bytes {
+    let value = this.get("transactionId");
+    return value.toBytes();
+  }
+
+  set transactionId(value: Bytes) {
+    this.set("transactionId", Value.fromBytes(value));
   }
 
   get events(): Array<string> {
@@ -147,7 +164,7 @@ export class Domain extends Entity {
   }
 }
 
-export class Transfer extends Entity {
+export class TransferEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -155,17 +172,17 @@ export class Transfer extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Transfer entity without an ID");
+    assert(id !== null, "Cannot save TransferEntity entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Transfer entity with non-string ID. " +
+      "Cannot save TransferEntity entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Transfer", id.toString(), this);
+    store.set("TransferEntity", id.toString(), this);
   }
 
-  static load(id: string): Transfer | null {
-    return store.get("Transfer", id) as Transfer | null;
+  static load(id: string): TransferEntity | null {
+    return store.get("TransferEntity", id) as TransferEntity | null;
   }
 
   get id(): string {
@@ -195,13 +212,13 @@ export class Transfer extends Entity {
     this.set("blockNumber", Value.fromI32(value));
   }
 
-  get transactionID(): Bytes {
-    let value = this.get("transactionID");
+  get transactionId(): Bytes {
+    let value = this.get("transactionId");
     return value.toBytes();
   }
 
-  set transactionID(value: Bytes) {
-    this.set("transactionID", Value.fromBytes(value));
+  set transactionId(value: Bytes) {
+    this.set("transactionId", Value.fromBytes(value));
   }
 
   get owner(): string {
@@ -212,72 +229,14 @@ export class Transfer extends Entity {
   set owner(value: string) {
     this.set("owner", Value.fromString(value));
   }
-}
 
-export class NewOwner extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
+  get events(): Array<string> {
+    let value = this.get("events");
+    return value.toStringArray();
   }
 
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save NewOwner entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save NewOwner entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("NewOwner", id.toString(), this);
-  }
-
-  static load(id: string): NewOwner | null {
-    return store.get("NewOwner", id) as NewOwner | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get domain(): string {
-    let value = this.get("domain");
-    return value.toString();
-  }
-
-  set domain(value: string) {
-    this.set("domain", Value.fromString(value));
-  }
-
-  get blockNumber(): i32 {
-    let value = this.get("blockNumber");
-    return value.toI32();
-  }
-
-  set blockNumber(value: i32) {
-    this.set("blockNumber", Value.fromI32(value));
-  }
-
-  get transactionID(): Bytes {
-    let value = this.get("transactionID");
-    return value.toBytes();
-  }
-
-  set transactionID(value: Bytes) {
-    this.set("transactionID", Value.fromBytes(value));
-  }
-
-  get owner(): string {
-    let value = this.get("owner");
-    return value.toString();
-  }
-
-  set owner(value: string) {
-    this.set("owner", Value.fromString(value));
+  set events(value: Array<string>) {
+    this.set("events", Value.fromStringArray(value));
   }
 }
 
@@ -311,12 +270,21 @@ export class Account extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get domains(): Array<string> {
-    let value = this.get("domains");
+  get ownedDomains(): Array<string | null> {
+    let value = this.get("ownedDomains");
     return value.toStringArray();
   }
 
-  set domains(value: Array<string>) {
-    this.set("domains", Value.fromStringArray(value));
+  set ownedDomains(value: Array<string | null>) {
+    this.set("ownedDomains", Value.fromStringArray(value));
+  }
+
+  get createdDomains(): Array<string | null> {
+    let value = this.get("createdDomains");
+    return value.toStringArray();
+  }
+
+  set createdDomains(value: Array<string | null>) {
+    this.set("createdDomains", Value.fromStringArray(value));
   }
 }

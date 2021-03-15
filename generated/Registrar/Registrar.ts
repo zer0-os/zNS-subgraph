@@ -126,6 +126,76 @@ export class DomainCreated__Params {
   get parent(): BigInt {
     return this._event.parameters[3].value.toBigInt();
   }
+
+  get creator(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
+  get controller(): Address {
+    return this._event.parameters[5].value.toAddress();
+  }
+}
+
+export class MetadataChanged extends ethereum.Event {
+  get params(): MetadataChanged__Params {
+    return new MetadataChanged__Params(this);
+  }
+}
+
+export class MetadataChanged__Params {
+  _event: MetadataChanged;
+
+  constructor(event: MetadataChanged) {
+    this._event = event;
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get uri(): string {
+    return this._event.parameters[1].value.toString();
+  }
+}
+
+export class MetadataLocked extends ethereum.Event {
+  get params(): MetadataLocked__Params {
+    return new MetadataLocked__Params(this);
+  }
+}
+
+export class MetadataLocked__Params {
+  _event: MetadataLocked;
+
+  constructor(event: MetadataLocked) {
+    this._event = event;
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get locker(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class MetadataUnlocked extends ethereum.Event {
+  get params(): MetadataUnlocked__Params {
+    return new MetadataUnlocked__Params(this);
+  }
+}
+
+export class MetadataUnlocked__Params {
+  _event: MetadataUnlocked;
+
+  constructor(event: MetadataUnlocked) {
+    this._event = event;
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
 }
 
 export class OwnershipTransferred extends ethereum.Event {
@@ -165,6 +235,28 @@ export class Paused__Params {
 
   get account(): Address {
     return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class RoyaltiesAmountChanged extends ethereum.Event {
+  get params(): RoyaltiesAmountChanged__Params {
+    return new RoyaltiesAmountChanged__Params(this);
+  }
+}
+
+export class RoyaltiesAmountChanged__Params {
+  _event: RoyaltiesAmountChanged;
+
+  constructor(event: RoyaltiesAmountChanged) {
+    this._event = event;
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -209,6 +301,38 @@ export class Unpaused__Params {
 
   get account(): Address {
     return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class Registrar__recordsResult {
+  value0: Address;
+  value1: boolean;
+  value2: Address;
+  value3: Address;
+  value4: BigInt;
+
+  constructor(
+    value0: Address,
+    value1: boolean,
+    value2: Address,
+    value3: Address,
+    value4: BigInt
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromBoolean(this.value1));
+    map.set("value2", ethereum.Value.fromAddress(this.value2));
+    map.set("value3", ethereum.Value.fromAddress(this.value3));
+    map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
+    return map;
   }
 }
 
@@ -289,6 +413,48 @@ export class Registrar extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
+  creatorOf(id: BigInt): Address {
+    let result = super.call("creatorOf", "creatorOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(id)
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_creatorOf(id: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall("creatorOf", "creatorOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(id)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  domainController(id: BigInt): Address {
+    let result = super.call(
+      "domainController",
+      "domainController(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_domainController(id: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "domainController",
+      "domainController(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   domainExists(id: BigInt): boolean {
     let result = super.call("domainExists", "domainExists(uint256):(bool)", [
       ethereum.Value.fromUnsignedBigInt(id)
@@ -306,6 +472,75 @@ export class Registrar extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  domainMetadataLocked(id: BigInt): boolean {
+    let result = super.call(
+      "domainMetadataLocked",
+      "domainMetadataLocked(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_domainMetadataLocked(id: BigInt): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "domainMetadataLocked",
+      "domainMetadataLocked(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  domainMetadataLockedBy(id: BigInt): Address {
+    let result = super.call(
+      "domainMetadataLockedBy",
+      "domainMetadataLockedBy(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_domainMetadataLockedBy(id: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "domainMetadataLockedBy",
+      "domainMetadataLockedBy(uint256):(address)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  domainRoyaltyAmount(id: BigInt): BigInt {
+    let result = super.call(
+      "domainRoyaltyAmount",
+      "domainRoyaltyAmount(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_domainRoyaltyAmount(id: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "domainRoyaltyAmount",
+      "domainRoyaltyAmount(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   getApproved(tokenId: BigInt): Address {
@@ -417,6 +652,43 @@ export class Registrar extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  records(param0: BigInt): Registrar__recordsResult {
+    let result = super.call(
+      "records",
+      "records(uint256):(address,bool,address,address,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return new Registrar__recordsResult(
+      result[0].toAddress(),
+      result[1].toBoolean(),
+      result[2].toAddress(),
+      result[3].toAddress(),
+      result[4].toBigInt()
+    );
+  }
+
+  try_records(param0: BigInt): ethereum.CallResult<Registrar__recordsResult> {
+    let result = super.tryCall(
+      "records",
+      "records(uint256):(address,bool,address,address,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Registrar__recordsResult(
+        value[0].toAddress(),
+        value[1].toBoolean(),
+        value[2].toAddress(),
+        value[3].toAddress(),
+        value[4].toBigInt()
+      )
+    );
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -545,32 +817,6 @@ export class Registrar extends ethereum.SmartContract {
   }
 }
 
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
-  }
-
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
-  }
-}
-
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-}
-
 export class AddControllerCall extends ethereum.Call {
   get inputs(): AddControllerCall__Inputs {
     return new AddControllerCall__Inputs(this);
@@ -635,6 +881,62 @@ export class ApproveCall__Outputs {
   }
 }
 
+export class InitializeCall extends ethereum.Call {
+  get inputs(): InitializeCall__Inputs {
+    return new InitializeCall__Inputs(this);
+  }
+
+  get outputs(): InitializeCall__Outputs {
+    return new InitializeCall__Outputs(this);
+  }
+}
+
+export class InitializeCall__Inputs {
+  _call: InitializeCall;
+
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class InitializeCall__Outputs {
+  _call: InitializeCall;
+
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class LockDomainMetadataCall extends ethereum.Call {
+  get inputs(): LockDomainMetadataCall__Inputs {
+    return new LockDomainMetadataCall__Inputs(this);
+  }
+
+  get outputs(): LockDomainMetadataCall__Outputs {
+    return new LockDomainMetadataCall__Outputs(this);
+  }
+}
+
+export class LockDomainMetadataCall__Inputs {
+  _call: LockDomainMetadataCall;
+
+  constructor(call: LockDomainMetadataCall) {
+    this._call = call;
+  }
+
+  get id(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class LockDomainMetadataCall__Outputs {
+  _call: LockDomainMetadataCall;
+
+  constructor(call: LockDomainMetadataCall) {
+    this._call = call;
+  }
+}
+
 export class RegisterDomainCall extends ethereum.Call {
   get inputs(): RegisterDomainCall__Inputs {
     return new RegisterDomainCall__Inputs(this);
@@ -662,6 +964,10 @@ export class RegisterDomainCall__Inputs {
 
   get domainOwner(): Address {
     return this._call.inputValues[2].value.toAddress();
+  }
+
+  get creator(): Address {
+    return this._call.inputValues[3].value.toAddress();
   }
 }
 
@@ -843,6 +1149,74 @@ export class SetApprovalForAllCall__Outputs {
   }
 }
 
+export class SetDomainMetadataUriCall extends ethereum.Call {
+  get inputs(): SetDomainMetadataUriCall__Inputs {
+    return new SetDomainMetadataUriCall__Inputs(this);
+  }
+
+  get outputs(): SetDomainMetadataUriCall__Outputs {
+    return new SetDomainMetadataUriCall__Outputs(this);
+  }
+}
+
+export class SetDomainMetadataUriCall__Inputs {
+  _call: SetDomainMetadataUriCall;
+
+  constructor(call: SetDomainMetadataUriCall) {
+    this._call = call;
+  }
+
+  get id(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get uri(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class SetDomainMetadataUriCall__Outputs {
+  _call: SetDomainMetadataUriCall;
+
+  constructor(call: SetDomainMetadataUriCall) {
+    this._call = call;
+  }
+}
+
+export class SetDomainRoyaltyAmountCall extends ethereum.Call {
+  get inputs(): SetDomainRoyaltyAmountCall__Inputs {
+    return new SetDomainRoyaltyAmountCall__Inputs(this);
+  }
+
+  get outputs(): SetDomainRoyaltyAmountCall__Outputs {
+    return new SetDomainRoyaltyAmountCall__Outputs(this);
+  }
+}
+
+export class SetDomainRoyaltyAmountCall__Inputs {
+  _call: SetDomainRoyaltyAmountCall;
+
+  constructor(call: SetDomainRoyaltyAmountCall) {
+    this._call = call;
+  }
+
+  get id(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get amount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class SetDomainRoyaltyAmountCall__Outputs {
+  _call: SetDomainRoyaltyAmountCall;
+
+  constructor(call: SetDomainRoyaltyAmountCall) {
+    this._call = call;
+  }
+}
+
 export class TransferFromCall extends ethereum.Call {
   get inputs(): TransferFromCall__Inputs {
     return new TransferFromCall__Inputs(this);
@@ -907,6 +1281,36 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnlockDomainMetadataCall extends ethereum.Call {
+  get inputs(): UnlockDomainMetadataCall__Inputs {
+    return new UnlockDomainMetadataCall__Inputs(this);
+  }
+
+  get outputs(): UnlockDomainMetadataCall__Outputs {
+    return new UnlockDomainMetadataCall__Outputs(this);
+  }
+}
+
+export class UnlockDomainMetadataCall__Inputs {
+  _call: UnlockDomainMetadataCall;
+
+  constructor(call: UnlockDomainMetadataCall) {
+    this._call = call;
+  }
+
+  get id(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UnlockDomainMetadataCall__Outputs {
+  _call: UnlockDomainMetadataCall;
+
+  constructor(call: UnlockDomainMetadataCall) {
     this._call = call;
   }
 }

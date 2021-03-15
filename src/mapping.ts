@@ -11,48 +11,44 @@ import {
   Transfer,
   Unpaused
 } from "../generated/Registrar/Registrar"
-import { Domain } from "../generated/schema"
+import { Account, Domain, TransferEntity} from "../generated/schema"
 
-//  event DomainCreated(
-//    uint256 indexed id,
-//    string name,
-//    uint256 indexed nameHash,
-//    uint256 indexed parent
-//  );
-//need a feild for owner address
+// event DomainCreated(
+//   uint256 indexed id,
+//   string name,
+//   uint256 indexed nameHash,
+//   uint256 indexed parent,
+//   address creator,
+//   address controller
+// );
 export function handleDomainCreated(event: DomainCreated): void {
-  let account = new Account(event.params.owner.toHex())
+  let account = new Account(event.params.creator.toHexString())
   account.save()
-
-  //store domain by the hash of its unique token ID
-  let domain = Domain.load(event.params.id.toHex())
-  let domainParent = Domain.load(event.params.parent.toHex())
-
-  if (domain == null) {
-    domain = new Domain(event.params.id.toHex())
-  }
-    domain.owner = event.params.owner
-    domain.creator = event.params.ownerOf
+  let domain = Domain.load(event.params.id.toHex());
+  let domainParent = Domain.load(event.params.parent.toHex());
+    domain.creator = account.id
     domain.name = event.params.name
-    domain.labelHash = event.params.nameHash
+    domain.labelHash = event.params.nameHash.toHexString()
     domain.parent = domainParent.name
+    domain.transactionId = event.transaction.hash
     domain.save()
+
 }
 
 // event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 export function handleTransfer(event: Transfer): void {
-  let account = new Account(event.params.owner.toHex())
+  let account = new Account(event.params.to.toHexString())
   account.save()
-  //store domain by the hash of its unique token ID
-  let domain = Domain.load(event.params.tokenId.toHex());
-  domain.owner = event.params.to
+
+  let domain = new Domain(event.params.tokenId.toHex());
+  domain.owner = account.id
   domain.save()
 
-  let transferEvent = new Transfer(createEventID(event))
-  transferEvent.id = transferEvent
-  transferEvent.domain = domain
+  let transferEvent = new TransferEntity(event.transaction.hash.toHex())
+  transferEvent.domain = event.params.tokenId.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
-  transferEvent.transactionID = event.transaction.hash
+  transferEvent.transactionId = event.transaction.hash
   transferEvent.owner = account.id
   transferEvent.save()
+
 }
