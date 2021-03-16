@@ -8,41 +8,20 @@ dataSources:
     source:
       address: "0x909d371c8898dca48ec65c72015388c1cb11f4a8"
       abi: Registrar
+      startBlock: 23924467
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - ControllerAdded
-        - ControllerRemoved
         - DomainCreated
-        - OwnershipTransferred
-        - Paused
-        - Transfer
-        - Unpaused
       abis:
         - name: Registrar
           file: Registrar/abis/Registrar.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: ControllerAdded(indexed address)
-          handler: handleControllerAdded
-        - event: ControllerRemoved(indexed address)
-          handler: handleControllerRemoved
         - event: DomainCreated(indexed uint256,string,indexed uint256,indexed
             uint256,address,address)
           handler: handleDomainCreated
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: Unpaused(address)
-          handler: handleUnpaused
       file: Registrar/Registrar.wasm

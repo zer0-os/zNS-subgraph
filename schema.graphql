@@ -3,33 +3,23 @@
 type Domain @entity {
   id: ID!
   name: String
-  labelName: String
   labelHash: String
   parent: Domain
-  subdomains: [Domain]! @derivedFrom(field: "parent")
+  subdomains: [Domain!]
   owner: Account
-  creator: Account!
-  transactionId: Bytes!
-  events: [DomainEvent!]! @derivedFrom(field: "domain")
-}
-interface DomainEvent {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionId: Bytes!
+  creator: Account
+  transactionId: Bytes
 }
 
-type TransferEntity implements DomainEvent @entity {
+type TransferEntity @entity {
   id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionId: Bytes!
-  owner: Account!
-  events: [DomainEvent!]!
+  domain: Domain
+  blockNumber: Int
+  transactionId: Bytes
 }
 
 type Account @entity {
     id: ID!
-    ownedDomains: [Domain]! @derivedFrom(field: "owner")
-    createdDomains: [Domain]! @derivedFrom(field: "creator")
+    ownedDomains: [Domain!] @derivedFrom(field: "owner")
+    createdDomains: [Domain!] @derivedFrom(field: "creator")
 }

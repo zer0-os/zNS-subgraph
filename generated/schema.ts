@@ -59,23 +59,6 @@ export class Domain extends Entity {
     }
   }
 
-  get labelName(): string | null {
-    let value = this.get("labelName");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set labelName(value: string | null) {
-    if (value === null) {
-      this.unset("labelName");
-    } else {
-      this.set("labelName", Value.fromString(value as string));
-    }
-  }
-
   get labelHash(): string | null {
     let value = this.get("labelHash");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -110,13 +93,21 @@ export class Domain extends Entity {
     }
   }
 
-  get subdomains(): Array<string | null> {
+  get subdomains(): Array<string> | null {
     let value = this.get("subdomains");
-    return value.toStringArray();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
   }
 
-  set subdomains(value: Array<string | null>) {
-    this.set("subdomains", Value.fromStringArray(value));
+  set subdomains(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("subdomains");
+    } else {
+      this.set("subdomains", Value.fromStringArray(value as Array<string>));
+    }
   }
 
   get owner(): string | null {
@@ -136,31 +127,38 @@ export class Domain extends Entity {
     }
   }
 
-  get creator(): string {
+  get creator(): string | null {
     let value = this.get("creator");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set creator(value: string) {
-    this.set("creator", Value.fromString(value));
+  set creator(value: string | null) {
+    if (value === null) {
+      this.unset("creator");
+    } else {
+      this.set("creator", Value.fromString(value as string));
+    }
   }
 
-  get transactionId(): Bytes {
+  get transactionId(): Bytes | null {
     let value = this.get("transactionId");
-    return value.toBytes();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set transactionId(value: Bytes) {
-    this.set("transactionId", Value.fromBytes(value));
-  }
-
-  get events(): Array<string> {
-    let value = this.get("events");
-    return value.toStringArray();
-  }
-
-  set events(value: Array<string>) {
-    this.set("events", Value.fromStringArray(value));
+  set transactionId(value: Bytes | null) {
+    if (value === null) {
+      this.unset("transactionId");
+    } else {
+      this.set("transactionId", Value.fromBytes(value as Bytes));
+    }
   }
 }
 
@@ -194,13 +192,21 @@ export class TransferEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get domain(): string {
+  get domain(): string | null {
     let value = this.get("domain");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set domain(value: string) {
-    this.set("domain", Value.fromString(value));
+  set domain(value: string | null) {
+    if (value === null) {
+      this.unset("domain");
+    } else {
+      this.set("domain", Value.fromString(value as string));
+    }
   }
 
   get blockNumber(): i32 {
@@ -212,31 +218,21 @@ export class TransferEntity extends Entity {
     this.set("blockNumber", Value.fromI32(value));
   }
 
-  get transactionId(): Bytes {
+  get transactionId(): Bytes | null {
     let value = this.get("transactionId");
-    return value.toBytes();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set transactionId(value: Bytes) {
-    this.set("transactionId", Value.fromBytes(value));
-  }
-
-  get owner(): string {
-    let value = this.get("owner");
-    return value.toString();
-  }
-
-  set owner(value: string) {
-    this.set("owner", Value.fromString(value));
-  }
-
-  get events(): Array<string> {
-    let value = this.get("events");
-    return value.toStringArray();
-  }
-
-  set events(value: Array<string>) {
-    this.set("events", Value.fromStringArray(value));
+  set transactionId(value: Bytes | null) {
+    if (value === null) {
+      this.unset("transactionId");
+    } else {
+      this.set("transactionId", Value.fromBytes(value as Bytes));
+    }
   }
 }
 
@@ -270,21 +266,37 @@ export class Account extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get ownedDomains(): Array<string | null> {
+  get ownedDomains(): Array<string> | null {
     let value = this.get("ownedDomains");
-    return value.toStringArray();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
   }
 
-  set ownedDomains(value: Array<string | null>) {
-    this.set("ownedDomains", Value.fromStringArray(value));
+  set ownedDomains(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("ownedDomains");
+    } else {
+      this.set("ownedDomains", Value.fromStringArray(value as Array<string>));
+    }
   }
 
-  get createdDomains(): Array<string | null> {
+  get createdDomains(): Array<string> | null {
     let value = this.get("createdDomains");
-    return value.toStringArray();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
   }
 
-  set createdDomains(value: Array<string | null>) {
-    this.set("createdDomains", Value.fromStringArray(value));
+  set createdDomains(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("createdDomains");
+    } else {
+      this.set("createdDomains", Value.fromStringArray(value as Array<string>));
+    }
   }
 }
