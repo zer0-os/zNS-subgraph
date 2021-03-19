@@ -52,6 +52,8 @@ export function handleTransfer(event: Transfer): void {
 
 
   }
+  domain.isLocked = false
+  domain.royalty = 0
   domain.owner = account.id
   domain.save()
 

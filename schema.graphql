@@ -9,8 +9,8 @@ type Domain @entity {
   owner: Account
   creator: Account
   transactionId: Bytes
-  lockedBy: Account
-  isLocked: Boolean
+  lockedBy: Account!
+  isLocked: Boolean!
   metaData: String
   royalty: BigInt
 }
