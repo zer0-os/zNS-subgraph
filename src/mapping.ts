@@ -7,7 +7,7 @@ import {
   MetadataUnlocked,
   MetadataChanged
 } from "../generated/Registrar/Registrar"
-import { Account, Domain, TransferEntity, MetaData} from "../generated/schema"
+import { Account, Domain, TransferEntity} from "../generated/schema"
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -48,6 +48,8 @@ export function handleTransfer(event: Transfer): void {
   let domain = Domain.load(event.params.tokenId.toHex())
   if(domain == null) {
     domain = new Domain(event.params.tokenId.toHex())
+
+
   }
   domain.owner = account.id
   domain.save()
@@ -60,38 +62,29 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleMetadataChanged(event: MetadataChanged): void {
-
-  let metadata = MetaData.load(event.params.id.toHex())
-  if(metadata == null) {
-    metadata = new MetaData(event.params.id.toHex())
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
   }
-
-  metadata.metaData = event.params.uri
-  metadata.transactionId = event.transaction.hash
-  metadata.save()
+  domain.metaData = event.params.uri
+  domain.save()
 }
 
 export function handleMetadataLocked(event: MetadataLocked): void {
-
-  let metadata = MetaData.load(event.params.id.toHex())
-  if(metadata == null) {
-    metadata = new MetaData(event.params.id.toHex())
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
   }
-
-  metadata.isLocked = true
-  metadata.lockedBy = event.params.locker
-  metadata.transactionId = event.transaction.hash
-  metadata.save()
+  domain.isLocked = true
+  domain.lockedBy = event.params.locker
+  domain.save()
 }
 
 export function handleMetadataUnlocked(event: MetadataUnlocked): void {
-
-  let metadata = MetaData.load(event.params.id.toHex())
-  if(metadata == null) {
-    metadata = new MetaData(event.params.id.toHex())
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
   }
-
-  metadata.isLocked = false
-  metadata.transactionId = event.transaction.hash
-  metadata.save()
+  domain.isLocked = false
+  domain.save()
 }
