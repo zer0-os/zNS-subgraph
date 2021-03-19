@@ -12,8 +12,7 @@ type Domain @entity {
   lockedBy: Account
   isLocked: Boolean
   metaData: String
-  royalty: Int
-  events: [Domain!]!
+  royalty: BigInt
 }
 
 type TransferEntity @entity {

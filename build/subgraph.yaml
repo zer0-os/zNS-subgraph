@@ -15,7 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - DomainCreated
-        - Transfer
+        - TransferEntity
         - Account
       abis:
         - name: Registrar
