@@ -300,3 +300,94 @@ export class Account extends Entity {
     }
   }
 }
+
+export class MetaData extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save MetaData entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save MetaData entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("MetaData", id.toString(), this);
+  }
+
+  static load(id: string): MetaData | null {
+    return store.get("MetaData", id) as MetaData | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get lockedBy(): Bytes | null {
+    let value = this.get("lockedBy");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set lockedBy(value: Bytes | null) {
+    if (value === null) {
+      this.unset("lockedBy");
+    } else {
+      this.set("lockedBy", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get isLocked(): boolean {
+    let value = this.get("isLocked");
+    return value.toBoolean();
+  }
+
+  set isLocked(value: boolean) {
+    this.set("isLocked", Value.fromBoolean(value));
+  }
+
+  get metaData(): string | null {
+    let value = this.get("metaData");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set metaData(value: string | null) {
+    if (value === null) {
+      this.unset("metaData");
+    } else {
+      this.set("metaData", Value.fromString(value as string));
+    }
+  }
+
+  get transactionId(): Bytes | null {
+    let value = this.get("transactionId");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set transactionId(value: Bytes | null) {
+    if (value === null) {
+      this.unset("transactionId");
+    } else {
+      this.set("transactionId", Value.fromBytes(value as Bytes));
+    }
+  }
+}

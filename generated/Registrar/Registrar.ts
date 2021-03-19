@@ -341,25 +341,6 @@ export class Registrar extends ethereum.SmartContract {
     return new Registrar("Registrar", address);
   }
 
-  available(id: BigInt): boolean {
-    let result = super.call("available", "available(uint256):(bool)", [
-      ethereum.Value.fromUnsignedBigInt(id)
-    ]);
-
-    return result[0].toBoolean();
-  }
-
-  try_available(id: BigInt): ethereum.CallResult<boolean> {
-    let result = super.tryCall("available", "available(uint256):(bool)", [
-      ethereum.Value.fromUnsignedBigInt(id)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
-  }
-
   balanceOf(owner: Address): BigInt {
     let result = super.call("balanceOf", "balanceOf(address):(uint256)", [
       ethereum.Value.fromAddress(owner)
@@ -474,29 +455,6 @@ export class Registrar extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  domainMetadataLocked(id: BigInt): boolean {
-    let result = super.call(
-      "domainMetadataLocked",
-      "domainMetadataLocked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(id)]
-    );
-
-    return result[0].toBoolean();
-  }
-
-  try_domainMetadataLocked(id: BigInt): ethereum.CallResult<boolean> {
-    let result = super.tryCall(
-      "domainMetadataLocked",
-      "domainMetadataLocked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(id)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
-  }
-
   domainMetadataLockedBy(id: BigInt): Address {
     let result = super.call(
       "domainMetadataLockedBy",
@@ -582,6 +540,48 @@ export class Registrar extends ethereum.SmartContract {
       "isApprovedForAll",
       "isApprovedForAll(address,address):(bool)",
       [ethereum.Value.fromAddress(owner), ethereum.Value.fromAddress(operator)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isAvailable(id: BigInt): boolean {
+    let result = super.call("isAvailable", "isAvailable(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(id)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_isAvailable(id: BigInt): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isAvailable", "isAvailable(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(id)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  isDomainMetadataLocked(id: BigInt): boolean {
+    let result = super.call(
+      "isDomainMetadataLocked",
+      "isDomainMetadataLocked(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_isDomainMetadataLocked(id: BigInt): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "isDomainMetadataLocked",
+      "isDomainMetadataLocked(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(id)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -689,6 +689,49 @@ export class Registrar extends ethereum.SmartContract {
         value[4].toBigInt()
       )
     );
+  }
+
+  registerDomain(
+    parentId: BigInt,
+    name: string,
+    domainOwner: Address,
+    creator: Address
+  ): BigInt {
+    let result = super.call(
+      "registerDomain",
+      "registerDomain(uint256,string,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(parentId),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromAddress(domainOwner),
+        ethereum.Value.fromAddress(creator)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_registerDomain(
+    parentId: BigInt,
+    name: string,
+    domainOwner: Address,
+    creator: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "registerDomain",
+      "registerDomain(uint256,string,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(parentId),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromAddress(domainOwner),
+        ethereum.Value.fromAddress(creator)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -954,7 +997,7 @@ export class RegisterDomainCall__Inputs {
     this._call = call;
   }
 
-  get parent(): BigInt {
+  get parentId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 
@@ -976,6 +1019,10 @@ export class RegisterDomainCall__Outputs {
 
   constructor(call: RegisterDomainCall) {
     this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }
 

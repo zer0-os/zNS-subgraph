@@ -5,11 +5,13 @@ type Domain @entity {
   name: String
   labelHash: String
   parent: Domain
-  subdomains: [Domain!]
+  subdomains: [Domain!] @derivedFrom(field: "parent")
   owner: Account
   creator: Account
   transactionId: Bytes
+  metaData:[MetaData!]
 }
+
 
 type TransferEntity @entity {
   id: ID!
@@ -22,4 +24,12 @@ type Account @entity {
     id: ID!
     ownedDomains: [Domain!] @derivedFrom(field: "owner")
     createdDomains: [Domain!] @derivedFrom(field: "creator")
+}
+
+type MetaData @entity {
+  id: ID!
+  lockedBy: Bytes
+  isLocked: Boolean
+  metaData: String
+  transactionId: Bytes
 }
