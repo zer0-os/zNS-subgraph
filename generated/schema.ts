@@ -161,20 +161,20 @@ export class Domain extends Entity {
     }
   }
 
-  get lockedBy(): Bytes | null {
+  get lockedBy(): string | null {
     let value = this.get("lockedBy");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set lockedBy(value: Bytes | null) {
+  set lockedBy(value: string | null) {
     if (value === null) {
       this.unset("lockedBy");
     } else {
-      this.set("lockedBy", Value.fromBytes(value as Bytes));
+      this.set("lockedBy", Value.fromString(value as string));
     }
   }
 

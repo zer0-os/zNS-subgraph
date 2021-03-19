@@ -71,12 +71,15 @@ export function handleMetadataChanged(event: MetadataChanged): void {
 }
 
 export function handleMetadataLocked(event: MetadataLocked): void {
+  let account = new Account(event.params.locker.toHex())
+  account.save()
+  
   let domain = Domain.load(event.params.id.toHex())
   if(domain == null) {
      domain = new Domain(event.params.id.toHex())
   }
   domain.isLocked = true
-  domain.lockedBy = event.params.locker
+  domain.lockedBy = account.id
   domain.save()
 }
 

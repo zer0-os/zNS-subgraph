@@ -9,13 +9,11 @@ type Domain @entity {
   owner: Account
   creator: Account
   transactionId: Bytes
-  lockedBy: Bytes
+  lockedBy: Account
   isLocked: Boolean
   metaData: String
   events: [Domain!]!
 }
-
-
 
 type TransferEntity @entity {
   id: ID!
