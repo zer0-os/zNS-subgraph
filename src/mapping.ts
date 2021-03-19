@@ -49,11 +49,9 @@ export function handleTransfer(event: Transfer): void {
   let domain = Domain.load(event.params.tokenId.toHex())
   if(domain == null) {
     domain = new Domain(event.params.tokenId.toHex())
-
-
+    domain.isLocked = false
+    domain.royalty = 0
   }
-  domain.isLocked = false
-  domain.royalty = 0
   domain.owner = account.id
   domain.save()
 
