@@ -16,9 +16,7 @@ dataSources:
       entities:
         - DomainCreated
         - Transfer
-        - MetadataLocked
-        - MetadataUnlocked
-        - MetadataChanged
+        - Account
       abis:
         - name: Registrar
           file: Registrar/abis/Registrar.json
@@ -34,4 +32,6 @@ dataSources:
           handler: handleMetadataUnlocked
         - event: MetadataChanged(indexed uint256,string)
           handler: handleMetadataChanged
+        - event: RoyaltiesAmountChanged(indexed uint256,uint256)
+          handler: handleRoyaltiesAmountChanged
       file: Registrar/Registrar.wasm

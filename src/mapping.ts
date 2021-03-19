@@ -5,7 +5,8 @@ import {
   Transfer,
   MetadataLocked,
   MetadataUnlocked,
-  MetadataChanged
+  MetadataChanged,
+  RoyaltiesAmountChanged
 } from "../generated/Registrar/Registrar"
 import { Account, Domain, TransferEntity} from "../generated/schema"
 
@@ -97,6 +98,6 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   if(domain == null) {
      domain = new Domain(event.params.id.toHex())
   }
-  domain.royalty = event.params.amount
+  domain.royalty = event.params.amount.toI32()
   domain.save()
 }

@@ -204,6 +204,15 @@ export class Domain extends Entity {
     }
   }
 
+  get royalty(): i32 {
+    let value = this.get("royalty");
+    return value.toI32();
+  }
+
+  set royalty(value: i32) {
+    this.set("royalty", Value.fromI32(value));
+  }
+
   get events(): Array<string> {
     let value = this.get("events");
     return value.toStringArray();

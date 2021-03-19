@@ -16,10 +16,7 @@ dataSources:
       entities:
         - DomainCreated
         - Transfer
-        - MetadataLocked
-        - MetadataUnlocked
-        - MetadataChanged
-        - RoyaltiesAmountChanged
+        - Account
       abis:
         - name: Registrar
           file: ./abis/Registrar.json
