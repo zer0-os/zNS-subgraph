@@ -19,6 +19,7 @@ dataSources:
         - MetadataLocked
         - MetadataUnlocked
         - MetadataChanged
+        - RoyaltiesAmountChanged
       abis:
         - name: Registrar
           file: ./abis/Registrar.json
@@ -33,4 +34,6 @@ dataSources:
           handler: handleMetadataUnlocked
         - event:  MetadataChanged(indexed uint256,string)
           handler: handleMetadataChanged
+        - event:  RoyaltiesAmountChanged(indexed uint256,uint256)
+          handler: handleRoyaltiesAmountChanged
       file: ./src/mapping.ts

@@ -73,7 +73,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
 export function handleMetadataLocked(event: MetadataLocked): void {
   let account = new Account(event.params.locker.toHex())
   account.save()
-  
+
   let domain = Domain.load(event.params.id.toHex())
   if(domain == null) {
      domain = new Domain(event.params.id.toHex())
@@ -89,5 +89,14 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
      domain = new Domain(event.params.id.toHex())
   }
   domain.isLocked = false
+  domain.save()
+}
+
+export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
+  }
+  domain.royalty = event.params.amount
   domain.save()
 }
