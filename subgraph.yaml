@@ -14,8 +14,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - DomainCreated
-        - DomainTransferred
+        - Domain
         - Account
       abis:
         - name: Registrar
@@ -25,12 +24,12 @@ dataSources:
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event:  MetadataChanged(indexed uint256,string)
+        - event: MetadataChanged(indexed uint256,string)
           handler: handleMetadataChanged
         - event: MetadataLocked(indexed uint256,address)
           handler: handleMetadataLocked
         - event: MetadataUnlocked(indexed uint256)
           handler: handleMetadataUnlocked
-        - event:  RoyaltiesAmountChanged(indexed uint256,uint256)
+        - event: RoyaltiesAmountChanged(indexed uint256,uint256)
           handler: handleRoyaltiesAmountChanged
       file: ./src/mapping.ts

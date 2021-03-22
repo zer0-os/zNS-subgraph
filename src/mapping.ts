@@ -33,8 +33,6 @@ export function handleDomainCreated(event: DomainCreated): void {
    }
    domain.labelHash = event.params.nameHash.toHex()
    domain.parent = domainParent.id
-   domain.blockNumber = event.block.number.toI32()
-   domain.transactionID = event.transaction.hash
 
    domain.save()
 
@@ -50,7 +48,6 @@ export function handleTransfer(event: Transfer): void {
     domain = new Domain(event.params.tokenId.toHex())
     domain.isLocked = false
     domain.royaltyAmount = BigInt.fromI32(0)
-    domain.events = []
   }
   domain.owner = account.id
   domain.save()

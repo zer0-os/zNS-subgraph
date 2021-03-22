@@ -1,19 +1,15 @@
-
-
 type Domain @entity {
   id: ID!
   name: String
   labelHash: String
   parent: Domain
-  subdomains: [Domain!] @derivedFrom(field: "parent")
+  subdomains: [Domain!]! @derivedFrom(field: "parent")
   owner: Account
   creator: Account
   lockedBy: Account
   isLocked: Boolean!
   metadata: String
   royaltyAmount: BigInt!
-  blockNumber: Int!
-  transactionID: Bytes!
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
@@ -32,7 +28,7 @@ type DomainTransferred implements DomainEvent @entity {
 }
 
 type Account @entity {
-    id: ID!
-    ownedDomains: [Domain!] @derivedFrom(field: "owner")
-    createdDomains: [Domain!] @derivedFrom(field: "creator")
+  id: ID!
+  ownedDomains: [Domain!]! @derivedFrom(field: "owner")
+  createdDomains: [Domain!]! @derivedFrom(field: "creator")
 }
