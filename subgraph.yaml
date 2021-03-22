@@ -6,7 +6,7 @@ dataSources:
     name: Registrar
     network: kovan
     source:
-      address: "0x909d371c8898dca48ec65c72015388c1cb11f4a8"
+      address: "0x0e46c45f8aca3f89Ad06F4a20E2BED1A12e4658C"
       abi: Registrar
       startBlock: 23924467
     mapping:
@@ -25,12 +25,12 @@ dataSources:
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event:  MetadataChanged(indexed uint256,string)
+          handler: handleMetadataChanged
         - event: MetadataLocked(indexed uint256,address)
           handler: handleMetadataLocked
         - event: MetadataUnlocked(indexed uint256)
           handler: handleMetadataUnlocked
-        - event:  MetadataChanged(indexed uint256,string)
-          handler: handleMetadataChanged
         - event:  RoyaltiesAmountChanged(indexed uint256,uint256)
           handler: handleRoyaltiesAmountChanged
       file: ./src/mapping.ts

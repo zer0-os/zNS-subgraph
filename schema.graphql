@@ -14,17 +14,17 @@ type Domain @entity {
   royaltyAmount: BigInt
   blockNumber: Int!
   transactionID: Bytes!
-  events: [DomainEvent!]!
+  events: [DomainTransferred!] @derivedFrom(field: "domain")
 }
 
-interface DomainEvent {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionID: Bytes!
-}
+# interface DomainEvent {
+#   id: ID!
+#   domain: Domain!
+#   blockNumber: Int!
+#   transactionID: Bytes!
+# }
 
-type DomainTransferred implements DomainEvent @entity {
+type DomainTransferred  @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
