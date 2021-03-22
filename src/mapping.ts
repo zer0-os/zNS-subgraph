@@ -8,7 +8,7 @@ import {
   MetadataChanged,
   RoyaltiesAmountChanged
 } from "../generated/Registrar/Registrar"
-import { Account, Domain, TransferEntity} from "../generated/schema"
+import { Account, Domain, DomainTransferred} from "../generated/schema"
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -36,7 +36,9 @@ export function handleDomainCreated(event: DomainCreated): void {
    }
    domain.labelHash = event.params.nameHash.toHex()
    domain.parent = domainParent.id
-   domain.transactionId = event.transaction.hash
+   domain.transactionID = event.transaction.hash
+   domain.blockNumber = event.block.number.toI32()
+
    domain.save()
 
 }
@@ -50,15 +52,15 @@ export function handleTransfer(event: Transfer): void {
   if(domain == null) {
     domain = new Domain(event.params.tokenId.toHex())
     domain.isLocked = false
-    domain.royalty = 0
+    domain.royaltyAmount = BigInt.fromI32(0)
   }
   domain.owner = account.id
   domain.save()
 
-  let transferEvent = new TransferEntity(event.transaction.hash.toHex())
+  let transferEvent = new DomainTransferred(event.transaction.hash.toHex())
   transferEvent.domain = event.params.tokenId.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
-  transferEvent.transactionId = event.transaction.hash
+  transferEvent.transactionID = event.transaction.hash
   transferEvent.save()
 }
 
@@ -67,7 +69,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   if(domain == null) {
      domain = new Domain(event.params.id.toHex())
   }
-  domain.metaData = event.params.uri
+  domain.metadata = event.params.uri
   domain.save()
 }
 
@@ -90,6 +92,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
      domain = new Domain(event.params.id.toHex())
   }
   domain.isLocked = false
+  domain.lockedBy = null
   domain.save()
 }
 
@@ -98,6 +101,6 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   if(domain == null) {
      domain = new Domain(event.params.id.toHex())
   }
-  domain.royalty = event.params.amount.toI32()
+  domain.royaltyAmount = event.params.amount
   domain.save()
 }
