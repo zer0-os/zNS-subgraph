@@ -8,7 +8,7 @@ import {
   MetadataChanged,
   RoyaltiesAmountChanged
 } from "../generated/Registrar/Registrar"
-import { Account, Domain, DomainTransferred} from "../generated/schema"
+import { Account, Domain, DomainTransferred } from "../generated/schema"
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -23,9 +23,6 @@ export function handleDomainCreated(event: DomainCreated): void {
   account.save()
 
   let domain = Domain.load(event.params.id.toHex())
-   if(domain == null) {
-      domain = new Domain(event.params.id.toHex())
-   }
   let domainParent = Domain.load(event.params.parent.toHex())
    domain.owner = account.id
    domain.creator = account.id
@@ -36,8 +33,8 @@ export function handleDomainCreated(event: DomainCreated): void {
    }
    domain.labelHash = event.params.nameHash.toHex()
    domain.parent = domainParent.id
-   domain.transactionID = event.transaction.hash
    domain.blockNumber = event.block.number.toI32()
+   domain.transactionID = event.transaction.hash
 
    domain.save()
 
@@ -53,6 +50,7 @@ export function handleTransfer(event: Transfer): void {
     domain = new Domain(event.params.tokenId.toHex())
     domain.isLocked = false
     domain.royaltyAmount = BigInt.fromI32(0)
+    domain.events = []
   }
   domain.owner = account.id
   domain.save()

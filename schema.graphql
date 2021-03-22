@@ -11,20 +11,20 @@ type Domain @entity {
   lockedBy: Account
   isLocked: Boolean!
   metadata: String
-  royaltyAmount: BigInt
+  royaltyAmount: BigInt!
   blockNumber: Int!
   transactionID: Bytes!
-  events: [DomainTransferred!] @derivedFrom(field: "domain")
+  events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
-# interface DomainEvent {
-#   id: ID!
-#   domain: Domain!
-#   blockNumber: Int!
-#   transactionID: Bytes!
-# }
+interface DomainEvent {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+}
 
-type DomainTransferred  @entity {
+type DomainTransferred implements DomainEvent @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
