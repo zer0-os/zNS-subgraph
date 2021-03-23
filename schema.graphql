@@ -1,25 +1,34 @@
-
-
 type Domain @entity {
   id: ID!
   name: String
   labelHash: String
   parent: Domain
-  subdomains: [Domain!]
+  subdomains: [Domain!]! @derivedFrom(field: "parent")
   owner: Account
   creator: Account
-  transactionId: Bytes
+  lockedBy: Account
+  isLocked: Boolean!
+  metadata: String
+  royaltyAmount: BigInt!
+  events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
-type TransferEntity @entity {
+interface DomainEvent {
   id: ID!
-  domain: Domain
-  blockNumber: Int
-  transactionId: Bytes
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+}
+
+type DomainTransferred implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
 }
 
 type Account @entity {
-    id: ID!
-    ownedDomains: [Domain!] @derivedFrom(field: "owner")
-    createdDomains: [Domain!] @derivedFrom(field: "creator")
+  id: ID!
+  ownedDomains: [Domain!]! @derivedFrom(field: "owner")
+  createdDomains: [Domain!]! @derivedFrom(field: "creator")
 }

@@ -1,17 +1,14 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import {
   Registrar,
-  Approval,
-  ApprovalForAll,
-  ControllerAdded,
-  ControllerRemoved,
   DomainCreated,
-  OwnershipTransferred,
-  Paused,
   Transfer,
-  Unpaused
+  MetadataLocked,
+  MetadataUnlocked,
+  MetadataChanged,
+  RoyaltiesAmountChanged
 } from "../generated/Registrar/Registrar"
-import { Account, Domain, TransferEntity} from "../generated/schema"
+import { Account, Domain, DomainTransferred } from "../generated/schema"
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -26,9 +23,6 @@ export function handleDomainCreated(event: DomainCreated): void {
   account.save()
 
   let domain = Domain.load(event.params.id.toHex())
-   if(domain == null) {
-      domain = new Domain(event.params.id.toHex())
-   }
   let domainParent = Domain.load(event.params.parent.toHex())
    domain.owner = account.id
    domain.creator = account.id
@@ -39,7 +33,7 @@ export function handleDomainCreated(event: DomainCreated): void {
    }
    domain.labelHash = event.params.nameHash.toHex()
    domain.parent = domainParent.id
-   domain.transactionId = event.transaction.hash
+
    domain.save()
 
 }
@@ -52,14 +46,56 @@ export function handleTransfer(event: Transfer): void {
   let domain = Domain.load(event.params.tokenId.toHex())
   if(domain == null) {
     domain = new Domain(event.params.tokenId.toHex())
+    domain.isLocked = false
+    domain.royaltyAmount = BigInt.fromI32(0)
   }
   domain.owner = account.id
   domain.save()
 
-  let transferEvent = new TransferEntity(event.transaction.hash.toHex())
+  let transferEvent = new DomainTransferred(event.transaction.hash.toHex())
   transferEvent.domain = event.params.tokenId.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
-  transferEvent.transactionId = event.transaction.hash
+  transferEvent.transactionID = event.transaction.hash
   transferEvent.save()
+}
 
+export function handleMetadataChanged(event: MetadataChanged): void {
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
+  }
+  domain.metadata = event.params.uri
+  domain.save()
+}
+
+export function handleMetadataLocked(event: MetadataLocked): void {
+  let account = new Account(event.params.locker.toHex())
+  account.save()
+
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
+  }
+  domain.isLocked = true
+  domain.lockedBy = account.id
+  domain.save()
+}
+
+export function handleMetadataUnlocked(event: MetadataUnlocked): void {
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
+  }
+  domain.isLocked = false
+  domain.lockedBy = null
+  domain.save()
+}
+
+export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
+  let domain = Domain.load(event.params.id.toHex())
+  if(domain == null) {
+     domain = new Domain(event.params.id.toHex())
+  }
+  domain.royaltyAmount = event.params.amount
+  domain.save()
 }
