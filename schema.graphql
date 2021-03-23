@@ -5,7 +5,7 @@ type Domain @entity {
   parent: Domain
   subdomains: [Domain!]! @derivedFrom(field: "parent")
   owner: Account
-  creator: Account
+  minter: Account
   lockedBy: Account
   isLocked: Boolean!
   metadata: String
@@ -30,5 +30,5 @@ type DomainTransferred implements DomainEvent @entity {
 type Account @entity {
   id: ID!
   ownedDomains: [Domain!]! @derivedFrom(field: "owner")
-  createdDomains: [Domain!]! @derivedFrom(field: "creator")
+  mintedDomains: [Domain!]! @derivedFrom(field: "minter")
 }
