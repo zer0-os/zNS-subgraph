@@ -10,6 +10,7 @@ type Domain @entity {
   isLocked: Boolean!
   metadata: String
   royaltyAmount: BigInt!
+  timeStamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
@@ -17,6 +18,7 @@ interface DomainEvent {
   id: ID!
   domain: Domain!
   blockNumber: Int!
+  timeStamp: BigInt!
   transactionID: Bytes!
 }
 
@@ -24,6 +26,7 @@ type DomainTransferred implements DomainEvent @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
+  timeStamp: BigInt!
   transactionID: Bytes!
 }
 

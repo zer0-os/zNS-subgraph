@@ -33,6 +33,7 @@ export function handleDomainCreated(event: DomainCreated): void {
   }
   domain.labelHash = event.params.nameHash.toHex();
   domain.parent = domainParent.id;
+  domain.timeStamp = event.block.timestamp;
 
   domain.save();
 }
@@ -55,6 +56,7 @@ export function handleTransfer(event: Transfer): void {
   transferEvent.domain = event.params.tokenId.toHex();
   transferEvent.blockNumber = event.block.number.toI32();
   transferEvent.transactionID = event.transaction.hash;
+  transferEvent.timeStamp = event.block.timestamp;
   transferEvent.save();
 }
 
