@@ -10,6 +10,7 @@ type Domain @entity {
   isLocked: Boolean!
   metadata: String
   royaltyAmount: BigInt!
+  creationTimestamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
@@ -17,6 +18,7 @@ interface DomainEvent {
   id: ID!
   domain: Domain!
   blockNumber: Int!
+  timestamp: BigInt!
   transactionID: Bytes!
 }
 
@@ -24,6 +26,7 @@ type DomainTransferred implements DomainEvent @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
+  timestamp: BigInt!
   transactionID: Bytes!
 }
 
@@ -31,4 +34,31 @@ type Account @entity {
   id: ID!
   ownedDomains: [Domain!]! @derivedFrom(field: "owner")
   mintedDomains: [Domain!]! @derivedFrom(field: "minter")
+}
+
+type DomainMetadataChanged implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  timestamp: BigInt!
+  transactionID: Bytes!
+  metadataUri: String!
+}
+
+type DomainMetadataLocked implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  timestamp: BigInt!
+  transactionID: Bytes!
+  isLocked: Boolean!
+}
+
+type DomainRoyaltyChanged implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  timestamp: BigInt!
+  transactionID: Bytes!
+  royaltyAmount: BigInt!
 }
