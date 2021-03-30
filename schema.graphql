@@ -42,7 +42,7 @@ type DomainMetadataChanged implements DomainEvent @entity {
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
-  metadata: String!
+  metadataUri: String!
 }
 
 type DomainMetadataLocked implements DomainEvent @entity {

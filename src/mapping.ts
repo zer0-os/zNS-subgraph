@@ -80,7 +80,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
     dmc.blockNumber = event.block.number.toI32();
     dmc.transactionID = event.transaction.hash;
     dmc.timestamp = event.block.timestamp;
-    dmc.metadata = event.params.uri;
+    dmc.metadataUri = event.params.uri;
 
     dmc.save();
 }
@@ -126,7 +126,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
 }
 
 export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
-  let domain = Domain.load(event.transaction.hash.toHex());
+  let domain = Domain.load(event.params.id.toHex());
   if (domain == null) {
     domain = new Domain(event.params.id.toHex());
   }
