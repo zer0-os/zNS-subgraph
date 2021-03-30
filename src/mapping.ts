@@ -80,6 +80,8 @@ export function handleMetadataChanged(event: MetadataChanged): void {
     dmc.blockNumber = event.block.number.toI32();
     dmc.transactionID = event.transaction.hash;
     dmc.timestamp = event.block.timestamp;
+    dmc.metadata = event.params.uri;
+
     dmc.save();
 }
 
@@ -100,6 +102,7 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
+  dml.isLocked = true;
   dml.save();
 }
 
@@ -117,6 +120,8 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
+  dml.isLocked = false;
+
   dml.save();
 }
 
@@ -133,5 +138,6 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   drc.blockNumber = event.block.number.toI32();
   drc.transactionID = event.transaction.hash;
   drc.timestamp = event.block.timestamp;
+  drc.royaltyAmount = event.params.amount;
   drc.save();
 }

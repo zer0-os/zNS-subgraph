@@ -42,6 +42,7 @@ type DomainMetadataChanged implements DomainEvent @entity {
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
+  metadata: String!
 }
 
 type DomainMetadataLocked implements DomainEvent @entity {
@@ -50,6 +51,7 @@ type DomainMetadataLocked implements DomainEvent @entity {
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
+  isLocked: Boolean!
 }
 
 type DomainRoyaltyChanged implements DomainEvent @entity {
@@ -58,4 +60,5 @@ type DomainRoyaltyChanged implements DomainEvent @entity {
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
+  royaltyAmount: BigInt!
 }
