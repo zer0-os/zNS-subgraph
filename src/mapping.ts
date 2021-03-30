@@ -75,7 +75,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   domain.metadata = event.params.uri;
   domain.save();
 
-    let dmc = new DomainMetadataChanged(event.params.uri);
+    let dmc = new DomainMetadataChanged(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
     dmc.domain = event.params.id.toHex();
     dmc.blockNumber = event.block.number.toI32();
     dmc.transactionID = event.transaction.hash;
@@ -97,7 +97,7 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   domain.lockedBy = account.id;
   domain.save();
 
-  let dml = new DomainMetadataLocked(event.block.timestamp.toHex());
+  let dml = new DomainMetadataLocked(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
   dml.domain = event.params.id.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
@@ -115,7 +115,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   domain.lockedBy = null;
   domain.save();
 
-  let dml = new DomainMetadataLocked(event.block.timestamp.toHex());
+  let dml = new DomainMetadataLocked(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
   dml.domain = event.params.id.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
@@ -133,7 +133,7 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   domain.royaltyAmount = event.params.amount;
   domain.save();
 
-  let drc = new DomainRoyaltyChanged(event.block.number.toHex());
+  let drc = new DomainRoyaltyChanged(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
   drc.domain = event.params.id.toHex();
   drc.blockNumber = event.block.number.toI32();
   drc.transactionID = event.transaction.hash;
