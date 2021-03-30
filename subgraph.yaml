@@ -6,7 +6,7 @@ dataSources:
     name: Registrar
     network: kovan
     source:
-      address: "0x909d371c8898dca48ec65c72015388c1cb11f4a8"
+      address: "0x74299b367E199a3f9a37fdFDb1f9dE85b1224A13"
       abi: Registrar
       startBlock: 23924467
     mapping:
@@ -15,7 +15,11 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Domain
+        - DomainTransferred
         - Account
+        - DomainMetadataChanged
+        - DomainMetadataLocked
+        - DomainRoyaltyChanged
       abis:
         - name: Registrar
           file: ./abis/Registrar.json

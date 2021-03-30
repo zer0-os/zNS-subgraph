@@ -8,7 +8,14 @@ import {
   MetadataChanged,
   RoyaltiesAmountChanged,
 } from "../generated/Registrar/Registrar";
-import { Account, Domain, DomainTransferred } from "../generated/schema";
+import {
+  Account,
+  Domain,
+  DomainTransferred,
+  DomainMetadataChanged,
+  DomainMetadataLocked,
+  DomainRoyaltyChanged
+ } from "../generated/schema";
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -33,7 +40,7 @@ export function handleDomainCreated(event: DomainCreated): void {
   }
   domain.labelHash = event.params.nameHash.toHex();
   domain.parent = domainParent.id;
-  domain.timeStamp = event.block.timestamp;
+  domain.creationTimestamp = event.block.timestamp;
 
   domain.save();
 }
@@ -56,7 +63,7 @@ export function handleTransfer(event: Transfer): void {
   transferEvent.domain = event.params.tokenId.toHex();
   transferEvent.blockNumber = event.block.number.toI32();
   transferEvent.transactionID = event.transaction.hash;
-  transferEvent.timeStamp = event.block.timestamp;
+  transferEvent.timestamp = event.block.timestamp;
   transferEvent.save();
 }
 
@@ -67,6 +74,13 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   }
   domain.metadata = event.params.uri;
   domain.save();
+
+    let dmc = new DomainMetadataChanged(event.params.uri);
+    dmc.domain = event.params.id.toHex();
+    dmc.blockNumber = event.block.number.toI32();
+    dmc.transactionID = event.transaction.hash;
+    dmc.timestamp = event.block.timestamp;
+    dmc.save();
 }
 
 export function handleMetadataLocked(event: MetadataLocked): void {
@@ -80,6 +94,13 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   domain.isLocked = true;
   domain.lockedBy = account.id;
   domain.save();
+
+  let dml = new DomainMetadataLocked(event.block.timestamp.toHex());
+  dml.domain = event.params.id.toHex();
+  dml.blockNumber = event.block.number.toI32();
+  dml.transactionID = event.transaction.hash;
+  dml.timestamp = event.block.timestamp;
+  dml.save();
 }
 
 export function handleMetadataUnlocked(event: MetadataUnlocked): void {
@@ -90,13 +111,27 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   domain.isLocked = false;
   domain.lockedBy = null;
   domain.save();
+
+  let dml = new DomainMetadataLocked(event.block.timestamp.toHex());
+  dml.domain = event.params.id.toHex();
+  dml.blockNumber = event.block.number.toI32();
+  dml.transactionID = event.transaction.hash;
+  dml.timestamp = event.block.timestamp;
+  dml.save();
 }
 
 export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
-  let domain = Domain.load(event.params.id.toHex());
+  let domain = Domain.load(event.transaction.hash.toHex());
   if (domain == null) {
     domain = new Domain(event.params.id.toHex());
   }
   domain.royaltyAmount = event.params.amount;
   domain.save();
+
+  let drc = new DomainRoyaltyChanged(event.block.number.toHex());
+  drc.domain = event.params.id.toHex();
+  drc.blockNumber = event.block.number.toI32();
+  drc.transactionID = event.transaction.hash;
+  drc.timestamp = event.block.timestamp;
+  drc.save();
 }
