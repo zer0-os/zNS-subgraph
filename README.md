@@ -1,6 +1,6 @@
 # ZNS Subgraph
 
-This repository has the ZNS Subgraph Implementation
+This repository has the ZNS Subgraph implementation.
 
 ## Install
 
