@@ -1,6 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import {
-  Registrar,
   DomainCreated,
   Transfer,
   MetadataLocked,
@@ -14,8 +13,8 @@ import {
   DomainTransferred,
   DomainMetadataChanged,
   DomainMetadataLocked,
-  DomainRoyaltyChanged
- } from "../generated/schema";
+  DomainRoyaltyChanged,
+} from "../generated/schema";
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -75,14 +74,16 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   domain.metadata = event.params.uri;
   domain.save();
 
-    let dmc = new DomainMetadataChanged(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
-    dmc.domain = event.params.id.toHex();
-    dmc.blockNumber = event.block.number.toI32();
-    dmc.transactionID = event.transaction.hash;
-    dmc.timestamp = event.block.timestamp;
-    dmc.metadataUri = event.params.uri;
+  let dmc = new DomainMetadataChanged(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
+  dmc.domain = event.params.id.toHex();
+  dmc.blockNumber = event.block.number.toI32();
+  dmc.transactionID = event.transaction.hash;
+  dmc.timestamp = event.block.timestamp;
+  dmc.metadataUri = event.params.uri;
 
-    dmc.save();
+  dmc.save();
 }
 
 export function handleMetadataLocked(event: MetadataLocked): void {
@@ -97,7 +98,9 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   domain.lockedBy = account.id;
   domain.save();
 
-  let dml = new DomainMetadataLocked(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
+  let dml = new DomainMetadataLocked(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
   dml.domain = event.params.id.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
@@ -115,7 +118,9 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   domain.lockedBy = null;
   domain.save();
 
-  let dml = new DomainMetadataLocked(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
+  let dml = new DomainMetadataLocked(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
   dml.domain = event.params.id.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
@@ -133,7 +138,9 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   domain.royaltyAmount = event.params.amount;
   domain.save();
 
-  let drc = new DomainRoyaltyChanged(event.block.number.toString().concat('-').concat(event.logIndex.toString()));
+  let drc = new DomainRoyaltyChanged(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
   drc.domain = event.params.id.toHex();
   drc.blockNumber = event.block.number.toI32();
   drc.transactionID = event.transaction.hash;

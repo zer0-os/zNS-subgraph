@@ -5,9 +5,10 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph codegen && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
-    "create-local": "graph create --node http://localhost:8020/ remscar/zns-kovan",
-    "remove-local": "graph remove --node http://localhost:8020/ remscar/zns-kovan",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 remscar/zns-kovan",
+    "auth": "graph auth --node https://api.thegraph.com/deploy/",
+    "create-local": "graph create --node http://localhost:8020/",
+    "remove-local": "graph remove --node http://localhost:8020/",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001",
     "lint": "eslint --max-warnings 0 \"src/*.{js,ts}\"",
     "lint-fix": "yarn lint --fix"
   },
