@@ -2,6 +2,7 @@ type Domain @entity {
   id: ID!
   name: String
   labelHash: String
+  label: String
   parent: Domain
   subdomains: [Domain!]! @derivedFrom(field: "parent")
   owner: Account
