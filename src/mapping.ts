@@ -66,10 +66,7 @@ export function handleTransfer(event: Transfer): void {
   domain.save();
 
   let transferEvent = new DomainTransferred(
-    event.block.number
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString()),
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
   transferEvent.domain = domainId.toHex();
   transferEvent.blockNumber = event.block.number.toI32();
@@ -88,10 +85,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   domain.save();
 
   let dmc = new DomainMetadataChanged(
-    event.block.number
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString()),
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
   dmc.domain = domainId.toHex();
   dmc.blockNumber = event.block.number.toI32();
@@ -116,10 +110,7 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   domain.save();
 
   let dml = new DomainMetadataLocked(
-    event.block.number
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString()),
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
   dml.domain = domainId.toHex();
   dml.blockNumber = event.block.number.toI32();
@@ -140,10 +131,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   domain.save();
 
   let dml = new DomainMetadataLocked(
-    event.block.number
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString()),
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
   dml.domain = domainId.toHex();
   dml.blockNumber = event.block.number.toI32();
@@ -164,10 +152,7 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   domain.save();
 
   let drc = new DomainRoyaltyChanged(
-    event.block.number
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString()),
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
   drc.domain = domainId.toHex();
   drc.blockNumber = event.block.number.toI32();
