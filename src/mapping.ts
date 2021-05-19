@@ -16,6 +16,8 @@ import {
   DomainRoyaltyChanged,
 } from "../generated/schema";
 
+import { uint256ToByteArray } from "./utils";
+
 // event DomainCreated(
 //   uint256 indexed id,
 //   string name,
@@ -28,8 +30,11 @@ export function handleDomainCreated(event: DomainCreated): void {
   let account = new Account(event.params.minter.toHex());
   account.save();
 
-  let domain = Domain.load(event.params.id.toHex());
-  let domainParent = Domain.load(event.params.parent.toHex());
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
+
+  let parentId = uint256ToByteArray(event.params.parent);
+  let domainParent = Domain.load(parentId.toHex());
   domain.owner = account.id;
   domain.minter = account.id;
   if (domainParent.name == null) {
@@ -37,8 +42,9 @@ export function handleDomainCreated(event: DomainCreated): void {
   } else {
     domain.name = domainParent.name + "." + event.params.name;
   }
+  domain.label = event.params.name;
   domain.labelHash = event.params.nameHash.toHex();
-  domain.parent = domainParent.id;
+  domain.parent = parentId.toHex();
   domain.creationTimestamp = event.block.timestamp;
 
   domain.save();
@@ -49,17 +55,20 @@ export function handleTransfer(event: Transfer): void {
   let account = new Account(event.params.to.toHex());
   account.save();
 
-  let domain = Domain.load(event.params.tokenId.toHex());
+  let domainId = uint256ToByteArray(event.params.tokenId);
+  let domain = Domain.load(domainId.toHex());
   if (domain == null) {
-    domain = new Domain(event.params.tokenId.toHex());
+    domain = new Domain(domainId.toHex());
     domain.isLocked = false;
     domain.royaltyAmount = BigInt.fromI32(0);
   }
   domain.owner = account.id;
   domain.save();
 
-  let transferEvent = new DomainTransferred(event.transaction.hash.toHex());
-  transferEvent.domain = event.params.tokenId.toHex();
+  let transferEvent = new DomainTransferred(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
+  transferEvent.domain = domainId.toHex();
   transferEvent.blockNumber = event.block.number.toI32();
   transferEvent.transactionID = event.transaction.hash;
   transferEvent.timestamp = event.block.timestamp;
@@ -67,9 +76,10 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleMetadataChanged(event: MetadataChanged): void {
-  let domain = Domain.load(event.params.id.toHex());
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
   if (domain == null) {
-    domain = new Domain(event.params.id.toHex());
+    domain = new Domain(domainId.toHex());
   }
   domain.metadata = event.params.uri;
   domain.save();
@@ -77,7 +87,7 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dmc.domain = event.params.id.toHex();
+  dmc.domain = domainId.toHex();
   dmc.blockNumber = event.block.number.toI32();
   dmc.transactionID = event.transaction.hash;
   dmc.timestamp = event.block.timestamp;
@@ -90,9 +100,10 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   let account = new Account(event.params.locker.toHex());
   account.save();
 
-  let domain = Domain.load(event.params.id.toHex());
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
   if (domain == null) {
-    domain = new Domain(event.params.id.toHex());
+    domain = new Domain(domainId.toHex());
   }
   domain.isLocked = true;
   domain.lockedBy = account.id;
@@ -101,7 +112,7 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dml.domain = event.params.id.toHex();
+  dml.domain = domainId.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
@@ -110,9 +121,10 @@ export function handleMetadataLocked(event: MetadataLocked): void {
 }
 
 export function handleMetadataUnlocked(event: MetadataUnlocked): void {
-  let domain = Domain.load(event.params.id.toHex());
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
   if (domain == null) {
-    domain = new Domain(event.params.id.toHex());
+    domain = new Domain(domainId.toHex());
   }
   domain.isLocked = false;
   domain.lockedBy = null;
@@ -121,7 +133,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dml.domain = event.params.id.toHex();
+  dml.domain = domainId.toHex();
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
@@ -131,9 +143,10 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
 }
 
 export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
-  let domain = Domain.load(event.params.id.toHex());
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
   if (domain == null) {
-    domain = new Domain(event.params.id.toHex());
+    domain = new Domain(domainId.toHex());
   }
   domain.royaltyAmount = event.params.amount;
   domain.save();
@@ -141,7 +154,7 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   let drc = new DomainRoyaltyChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  drc.domain = event.params.id.toHex();
+  drc.domain = domainId.toHex();
   drc.blockNumber = event.block.number.toI32();
   drc.transactionID = event.transaction.hash;
   drc.timestamp = event.block.timestamp;

@@ -6,7 +6,7 @@ dataSources:
     name: Registrar
     network: kovan
     source:
-      address: "0x74299b367E199a3f9a37fdFDb1f9dE85b1224A13"
+      address: "0x7293c267cA90FEdD32c67AEf52fB3416903A24B3"
       abi: Registrar
       startBlock: 23924467
     mapping:
