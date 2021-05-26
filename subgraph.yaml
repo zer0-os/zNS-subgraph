@@ -36,4 +36,4 @@ dataSources:
           handler: handleMetadataUnlocked
         - event: RoyaltiesAmountChanged(indexed uint256,uint256)
           handler: handleRoyaltiesAmountChanged
-      file: ./src/mapping.ts
+      file: ./src/registrar.ts

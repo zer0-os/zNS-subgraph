@@ -16,7 +16,7 @@ import {
   DomainRoyaltyChanged,
 } from "../generated/schema";
 
-import { uint256ToByteArray } from "./utils";
+import { uint256ToByteArray, containsAny } from "./utils";
 
 // event DomainCreated(
 //   uint256 indexed id,
@@ -37,6 +37,12 @@ export function handleDomainCreated(event: DomainCreated): void {
   let domainParent = Domain.load(parentId.toHex());
   domain.owner = account.id;
   domain.minter = account.id;
+
+  let hasBadCharacters = containsAny(event.params.name, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
+  if (hasBadCharacters) {
+    return;
+  }
+
   if (domainParent.name == null) {
     domain.name = event.params.name;
   } else {
