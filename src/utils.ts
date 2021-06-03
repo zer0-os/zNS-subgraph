@@ -15,3 +15,13 @@ export function uint256ToByteArray(i: BigInt): ByteArray {
   let hex = i.toHex().slice(2).padStart(64, "0");
   return byteArrayFromHex(hex);
 }
+
+export function containsAny(target: string, search: string): boolean {
+  for (let i = 0; i < search.length; ++i) {
+    if (target.includes(search.charAt(i))) {
+      return true;
+    }
+  }
+
+  return false;
+}
