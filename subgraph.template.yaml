@@ -4,7 +4,8 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Registrar
-    network: { { network } }
+    # prettier-ignore
+    network: {{ network }}
     source:
       address: "{{registrar_address}}"
       abi: Registrar
