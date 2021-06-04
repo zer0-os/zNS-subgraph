@@ -1,10 +1,14 @@
 {
-  "name": "ZNS",
-  "license": "UNLICENSED",
+  "name": "zNS-subgraph",
+  "license": "MIT",
   "scripts": {
+    "prepare:kovan": "mustache config/kovan.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:kovan": "yarn prepare:kovan && yarn internal:deploy",
+    "deploy:mainnet": "yarn prepare:mainnet && yarn internal:deploy",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph codegen && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
+    "internal:deploy": "graph codegen && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
     "auth": "graph auth --node https://api.thegraph.com/deploy/",
     "create-local": "graph create --node http://localhost:8020/",
     "remove-local": "graph remove --node http://localhost:8020/",
@@ -23,6 +27,7 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
     "prettier": "^2.2.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "mustache": "^4.2.0"
   }
 }
