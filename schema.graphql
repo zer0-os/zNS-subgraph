@@ -13,6 +13,7 @@ type Domain @entity {
   royaltyAmount: BigInt!
   creationTimestamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
+  nonce: BigInt!
 }
 
 interface DomainEvent {
@@ -62,4 +63,18 @@ type DomainRoyaltyChanged implements DomainEvent @entity {
   timestamp: BigInt!
   transactionID: Bytes!
   royaltyAmount: BigInt!
+}
+
+type DomainRequest @entity {
+  id: ID!
+  parent: Domain
+  offeredAmount: BigInt
+  requestUri: String
+  label: String
+  domain: String
+  requestor: Account
+  nonce: BigInt
+  approved: Boolean
+  fulfilled: Boolean
+  timestamp: BigInt
 }
