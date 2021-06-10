@@ -13,7 +13,8 @@ type Domain @entity {
   royaltyAmount: BigInt!
   creationTimestamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
-  nonce: BigInt!
+  nonce: BigInt
+  requests: [DomainRequest!]! @derivedFrom(field: "parent")
 }
 
 interface DomainEvent {
@@ -36,6 +37,7 @@ type Account @entity {
   id: ID!
   ownedDomains: [Domain!]! @derivedFrom(field: "owner")
   mintedDomains: [Domain!]! @derivedFrom(field: "minter")
+  requests: [DomainRequest!]! @derivedFrom(field: "requestor")
 }
 
 type DomainMetadataChanged implements DomainEvent @entity {
@@ -67,14 +69,14 @@ type DomainRoyaltyChanged implements DomainEvent @entity {
 
 type DomainRequest @entity {
   id: ID!
-  parent: Domain
-  offeredAmount: BigInt
-  requestUri: String
-  label: String
-  domain: String
-  requestor: Account
-  nonce: BigInt
-  approved: Boolean
-  fulfilled: Boolean
-  timestamp: BigInt
+  parent: Domain!
+  offeredAmount: BigInt!
+  requestUri: String!
+  label: String!
+  domain: String!
+  requestor: Account!
+  nonce: BigInt!
+  approved: Boolean!
+  fulfilled: Boolean!
+  timestamp: BigInt!
 }

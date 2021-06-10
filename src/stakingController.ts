@@ -13,30 +13,30 @@ export function handleDomainRequestPlaced(event: DomainRequestPlaced): void {
   let parentId = uint256ToByteArray(event.params.parentId);
   let domainParent = Domain.load(parentId.toHex());
 
-  let domainLabel = event.params.name;
+  let requestedLabel = event.params.name;
 
-  let hasBadCharacters = containsAny(domainLabel, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
+  let hasBadCharacters = containsAny(requestedLabel, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
   if (hasBadCharacters) {
     return;
   }
 
   let request = new DomainRequest(event.params.requestId.toHex());
   request.parent = parentId.toHex();
-  request.requestUri = event.params.requestUri;
-  request.requestor = account.id;
-  request.nonce = event.params.domainNonce;
   request.offeredAmount = event.params.offeredAmount;
-  request.label = event.params.name.toString();
+  request.requestUri = event.params.requestUri;
+  request.label = requestedLabel;
+  request.requestor = account.id;
 
   if (domainParent.name == null) {
-    request.domain = domainLabel;
+    request.domain = requestedLabel;
   } else {
-    request.domain = domainParent.name + "." + domainLabel;
+    request.domain = domainParent.name + "." + requestedLabel;
   }
 
-  request.timestamp = event.block.timestamp;
-  request.fulfilled = false;
+  request.nonce = event.params.domainNonce;
   request.approved = false;
+  request.fulfilled = false;
+  request.timestamp = event.block.timestamp;
 
   request.save();
 }
