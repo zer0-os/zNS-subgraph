@@ -1,6 +1,6 @@
 {
   "network": "kovan",
-  "registrar_address": "0x7293c267cA90FEdD32c67AEf52fB3416903A24B3",
-  "staking_controller_address": "0xC6E3a8eD83eFdA986Eab9EfA4286fb031333448f",
-  "start_block": 24505316
+  "registrar_address": "0xC613fCc3f81cC2888C5Cccc1620212420FFe4931",
+  "staking_controller_address": "0x1E3F8B31b24EC0E938BE45ecF6971584F90A1602",
+  "start_block": 26707500
 }
