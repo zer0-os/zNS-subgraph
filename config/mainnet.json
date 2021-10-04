@@ -1,6 +1,6 @@
 {
   "network": "mainnet",
   "registrar_address": "0xc2e9678A71e50E5AEd036e00e9c5caeb1aC5987D",
-  "staking_controller_address": "0x09d36c4e72F740D46C18769d91b446Fdbb71B2B5",
+  "staking_controller_address": "0x45b13d8e6579d5C3FeC14bB9998A3640CD4F008D",
   "start_block": 12000000
 }

@@ -14,6 +14,7 @@ import {
   DomainMetadataChanged,
   DomainMetadataLocked,
   DomainRoyaltyChanged,
+  DomainMinted,
 } from "../generated/schema";
 
 import { uint256ToByteArray, containsAny } from "./utils";
@@ -54,12 +55,22 @@ export function handleDomainCreated(event: DomainCreated): void {
   domain.creationTimestamp = event.block.timestamp;
 
   domain.save();
+
+  let mintedEvent = new DomainMinted(domainId.toHex());
+  mintedEvent.domain = domainId.toHex();
+  mintedEvent.blockNumber = event.block.number.toI32();
+  mintedEvent.transactionID = event.transaction.hash;
+  mintedEvent.timestamp = event.block.timestamp;
+  mintedEvent.minter = event.params.minter.toHex();
+  mintedEvent.save();
 }
 
 // event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 export function handleTransfer(event: Transfer): void {
   let account = new Account(event.params.to.toHex());
   account.save();
+  let fromAccount = new Account(event.params.from.toHex());
+  fromAccount.save();
 
   let domainId = uint256ToByteArray(event.params.tokenId);
   let domain = Domain.load(domainId.toHex());
@@ -78,6 +89,8 @@ export function handleTransfer(event: Transfer): void {
   transferEvent.blockNumber = event.block.number.toI32();
   transferEvent.transactionID = event.transaction.hash;
   transferEvent.timestamp = event.block.timestamp;
+  transferEvent.from = event.params.from.toHex() !== null ? event.params.from.toHex() : "0x0";
+  transferEvent.to = event.params.to.toHex();
   transferEvent.save();
 }
 

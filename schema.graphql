@@ -25,12 +25,23 @@ interface DomainEvent {
   transactionID: Bytes!
 }
 
+type DomainMinted implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  timestamp: BigInt!
+  transactionID: Bytes!
+  minter: Account!
+}
+
 type DomainTransferred implements DomainEvent @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
+  from: Account!
+  to: Account!
 }
 
 type Account @entity {
