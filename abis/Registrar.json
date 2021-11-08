@@ -117,6 +117,61 @@
           "internalType": "address",
           "name": "controller",
           "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadataUri",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "royaltyAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "DomainCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "nameHash",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "parent",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "minter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "controller",
+          "type": "address"
         }
       ],
       "name": "DomainCreated",
@@ -139,6 +194,31 @@
         }
       ],
       "name": "MetadataChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "locker",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "isLocked",
+          "type": "bool"
+        }
+      ],
+      "name": "MetadataLockChanged",
       "type": "event"
     },
     {
@@ -473,12 +553,12 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
-      "name": "isAvailable",
+      "name": "isController",
       "outputs": [
         {
           "internalType": "bool",
@@ -514,22 +594,14 @@
           "internalType": "uint256",
           "name": "id",
           "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "toLock",
+          "type": "bool"
         }
       ],
       "name": "lockDomainMetadata",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        }
-      ],
-      "name": "lockDomainMetadataForOwner",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -599,6 +671,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "parentOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "pause",
       "outputs": [],
@@ -652,6 +743,11 @@
           "internalType": "uint256",
           "name": "royaltyAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "parentId",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -671,13 +767,23 @@
         },
         {
           "internalType": "address",
-          "name": "domainOwner",
+          "name": "minter",
           "type": "address"
         },
         {
-          "internalType": "address",
-          "name": "minter",
-          "type": "address"
+          "internalType": "string",
+          "name": "metadataUri",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "royaltyAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "locked",
+          "type": "bool"
         }
       ],
       "name": "registerDomain",
@@ -955,19 +1061,6 @@
         }
       ],
       "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        }
-      ],
-      "name": "unlockDomainMetadata",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

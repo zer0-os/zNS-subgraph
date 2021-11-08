@@ -2,10 +2,12 @@ import { BigInt } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
-  MetadataLocked,
-  MetadataUnlocked,
   MetadataChanged,
   RoyaltiesAmountChanged,
+  MetadataLockChanged,
+  Registrar,
+  MetadataUnlocked,
+  MetadataLocked,
 } from "../generated/Registrar/Registrar";
 import {
   Account,
@@ -52,7 +54,13 @@ export function handleDomainCreated(event: DomainCreated): void {
   domain.label = event.params.name;
   domain.labelHash = event.params.nameHash.toHex();
   domain.parent = parentId.toHex();
+  domain.metadata = event.params.metadataUri;
   domain.creationTimestamp = event.block.timestamp;
+  domain.royaltyAmount = event.params.royaltyAmount;
+
+  let registrar = Registrar.bind(event.address);
+  domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
+  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toString();
 
   domain.save();
 
@@ -115,6 +123,50 @@ export function handleMetadataChanged(event: MetadataChanged): void {
   dmc.save();
 }
 
+export function handleMetadataLockChanged(event: MetadataLockChanged): void {
+  let account = new Account(event.params.locker.toHex());
+  account.save();
+
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
+  if (domain == null) {
+    domain = new Domain(domainId.toHex());
+  }
+  domain.isLocked = event.params.isLocked;
+  domain.lockedBy = account.id;
+  domain.save();
+
+  let dml = new DomainMetadataLocked(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
+  dml.domain = domainId.toHex();
+  dml.blockNumber = event.block.number.toI32();
+  dml.transactionID = event.transaction.hash;
+  dml.timestamp = event.block.timestamp;
+  dml.isLocked = event.params.isLocked;
+  dml.save();
+}
+
+export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
+  let domainId = uint256ToByteArray(event.params.id);
+  let domain = Domain.load(domainId.toHex());
+  if (domain == null) {
+    domain = new Domain(domainId.toHex());
+  }
+  domain.royaltyAmount = event.params.amount;
+  domain.save();
+
+  let drc = new DomainRoyaltyChanged(
+    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
+  );
+  drc.domain = domainId.toHex();
+  drc.blockNumber = event.block.number.toI32();
+  drc.transactionID = event.transaction.hash;
+  drc.timestamp = event.block.timestamp;
+  drc.royaltyAmount = event.params.amount;
+  drc.save();
+}
+
 export function handleMetadataLocked(event: MetadataLocked): void {
   let account = new Account(event.params.locker.toHex());
   account.save();
@@ -157,26 +209,43 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
   dml.isLocked = false;
-
   dml.save();
 }
 
-export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
+export function handleDomainCreatedLegacy(event: DomainCreated): void {
+  let account = new Account(event.params.minter.toHex());
+  account.save();
+
   let domainId = uint256ToByteArray(event.params.id);
   let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+
+  let parentId = uint256ToByteArray(event.params.parent);
+  let domainParent = Domain.load(parentId.toHex());
+  domain.owner = account.id;
+  domain.minter = account.id;
+
+  let hasBadCharacters = containsAny(event.params.name, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
+  if (hasBadCharacters) {
+    return;
   }
-  domain.royaltyAmount = event.params.amount;
+
+  if (domainParent.name == null) {
+    domain.name = event.params.name;
+  } else {
+    domain.name = domainParent.name + "." + event.params.name;
+  }
+  domain.label = event.params.name;
+  domain.labelHash = event.params.nameHash.toHex();
+  domain.parent = parentId.toHex();
+  domain.creationTimestamp = event.block.timestamp;
+
   domain.save();
 
-  let drc = new DomainRoyaltyChanged(
-    event.block.number.toString().concat("-").concat(event.logIndex.toString()),
-  );
-  drc.domain = domainId.toHex();
-  drc.blockNumber = event.block.number.toI32();
-  drc.transactionID = event.transaction.hash;
-  drc.timestamp = event.block.timestamp;
-  drc.royaltyAmount = event.params.amount;
-  drc.save();
+  let mintedEvent = new DomainMinted(domainId.toHex());
+  mintedEvent.domain = domainId.toHex();
+  mintedEvent.blockNumber = event.block.number.toI32();
+  mintedEvent.transactionID = event.transaction.hash;
+  mintedEvent.timestamp = event.block.timestamp;
+  mintedEvent.minter = event.params.minter.toHex();
+  mintedEvent.save();
 }

@@ -27,11 +27,15 @@ dataSources:
           file: ./abis/Registrar.json
       eventHandlers:
         - event: DomainCreated(indexed uint256,string,indexed uint256,indexed uint256,address,address)
+          handler: handleDomainCreatedLegacy
+        - event: DomainCreated(indexed uint256,string,indexed uint256,indexed uint256,address,address,string,uint256)
           handler: handleDomainCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
         - event: MetadataChanged(indexed uint256,string)
           handler: handleMetadataChanged
+        - event: MetadataLockChanged(indexed uint256,address,bool)
+          handler: handleMetadataLockChanged
         - event: MetadataLocked(indexed uint256,address)
           handler: handleMetadataLocked
         - event: MetadataUnlocked(indexed uint256)
