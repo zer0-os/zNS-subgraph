@@ -87,7 +87,7 @@
           "type": "string"
         },
         {
-          "indexed": true,
+          "indexed": false,
           "internalType": "string",
           "name": "name",
           "type": "string"
@@ -219,7 +219,7 @@
         },
         {
           "internalType": "contract IERC20Upgradeable",
-          "name": "_infinity",
+          "name": "_token",
           "type": "address"
         }
       ],
@@ -365,8 +365,19 @@
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "internalType": "contract IERC20Upgradeable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
-  ],
-  "linkReferences": {},
-  "deployedLinkReferences": {}
+  ]
 }

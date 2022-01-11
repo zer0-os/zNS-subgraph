@@ -1,5 +1,6 @@
 type Domain @entity {
   id: ID!
+  indexId: Int
   name: String
   labelHash: String
   label: String
@@ -13,6 +14,8 @@ type Domain @entity {
   royaltyAmount: BigInt!
   creationTimestamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
+  nonce: BigInt
+  requests: [DomainRequest!]! @derivedFrom(field: "parent")
 }
 
 interface DomainEvent {
@@ -23,18 +26,30 @@ interface DomainEvent {
   transactionID: Bytes!
 }
 
+type DomainMinted implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  timestamp: BigInt!
+  transactionID: Bytes!
+  minter: Account!
+}
+
 type DomainTransferred implements DomainEvent @entity {
   id: ID!
   domain: Domain!
   blockNumber: Int!
   timestamp: BigInt!
   transactionID: Bytes!
+  from: Account!
+  to: Account!
 }
 
 type Account @entity {
   id: ID!
   ownedDomains: [Domain!]! @derivedFrom(field: "owner")
   mintedDomains: [Domain!]! @derivedFrom(field: "minter")
+  requests: [DomainRequest!]! @derivedFrom(field: "requestor")
 }
 
 type DomainMetadataChanged implements DomainEvent @entity {
@@ -62,4 +77,23 @@ type DomainRoyaltyChanged implements DomainEvent @entity {
   timestamp: BigInt!
   transactionID: Bytes!
   royaltyAmount: BigInt!
+}
+
+type DomainRequest @entity {
+  id: ID!
+  parent: Domain!
+  offeredAmount: BigInt!
+  requestUri: String!
+  label: String!
+  domain: String!
+  requestor: Account!
+  nonce: BigInt!
+  approved: Boolean!
+  fulfilled: Boolean!
+  timestamp: BigInt!
+}
+
+type Global @entity {
+  id: ID!
+  domainCount: Int!
 }
