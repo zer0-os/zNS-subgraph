@@ -17,6 +17,7 @@ import {
   DomainMetadataLocked,
   DomainRoyaltyChanged,
   DomainMinted,
+  Global,
 } from "../generated/schema";
 
 import { uint256ToByteArray, containsAny } from "./utils";
@@ -33,8 +34,17 @@ export function handleDomainCreated(event: DomainCreated): void {
   let account = new Account(event.params.minter.toHex());
   account.save();
 
+  let global = Global.load("1");
+  if (global == null) {
+    global = new Global("1");
+    global.domainCount = 0;
+  }
+  global.domainCount += 1;
+  global.save();
+
   let domainId = uint256ToByteArray(event.params.id);
   let domain = Domain.load(domainId.toHex());
+  domain.indexId = global.domainCount;
 
   let parentId = uint256ToByteArray(event.params.parent);
   let domainParent = Domain.load(parentId.toHex());
@@ -218,6 +228,16 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
 
   let domainId = uint256ToByteArray(event.params.id);
   let domain = Domain.load(domainId.toHex());
+
+  let global = Global.load("1");
+  if (global == null) {
+    global = new Global("1");
+    global.domainCount = 0;
+  }
+  global.domainCount += 1;
+  global.save();
+
+  domain.indexId = global.domainCount;
 
   let parentId = uint256ToByteArray(event.params.parent);
   let domainParent = Domain.load(parentId.toHex());

@@ -1,5 +1,6 @@
 type Domain @entity {
   id: ID!
+  indexId: Int
   name: String
   labelHash: String
   label: String
@@ -90,4 +91,9 @@ type DomainRequest @entity {
   approved: Boolean!
   fulfilled: Boolean!
   timestamp: BigInt!
+}
+
+type Global @entity {
+  id: ID!
+  domainCount: Int!
 }
