@@ -44,29 +44,39 @@ dataSources:
           handler: handleRoyaltiesAmountChanged
       file: ./src/registrar.ts
   - kind: ethereum/contract
-    name: StakingController
+    name: ZNSHub
     # prettier-ignore
     network: {{ network }}
     source:
-      address: "{{staking_controller_address}}"
-      abi: StakingController
+      address: "{{hub_address}}"
+      abi: ZNSHub
       # prettier-ignore
-      startBlock: {{ start_block }}
+      startBlock: {{ hub_start_block }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - Domain
-        - DomainRequest
+        - DomainTransferred
+        - Account
+        - DomainMetadataChanged
+        - DomainMetadataLocked
+        - DomainRoyaltyChanged
       abis:
-        - name: StakingController
-          file: ./abis/StakingController.json
+        - name: ZNSHub
+          file: ./abis/ZNSHub.json
       eventHandlers:
-        - event: DomainRequestPlaced(indexed uint256,indexed uint256,uint256,string,string,address,uint256)
-          handler: handleDomainRequestPlaced
-        - event: DomainRequestApproved(indexed uint256)
-          handler: handleDomainRequestApproved
-        - event: DomainRequestFulfilled(indexed uint256,string,address,indexed uint256,indexed uint256,uint256)
-          handler: handleDomainRequestFulfilled
-      file: ./src/stakingController.ts
+        - event: EEDomainCreatedV2(address,indexed uint256,string,indexed uint256,indexed uint256,address,address,string,uint256)
+          handler: handleDomainCreatedV2
+        - event: EEMetadataChanged(address,indexed uint256,string)
+          handler: handleMetadataChanged
+        - event: EEMetadataLockChanged(address,indexed uint256,address,bool)
+          handler: handleMetadataLockChanged
+        - event: EENewSubdomainRegistrar(address,uint256,address)
+          handler: handleNewSubdomainRegistrar
+        - event: EERoyaltiesAmountChanged(address,indexed uint256,uint256)
+          handler: handleRoyaltiesAmountChanged
+        - event: EETransferV1(address,indexed address,indexed address,indexed uint256)
+          handler: handleTransferV1
+      file: ./src/hub.ts
