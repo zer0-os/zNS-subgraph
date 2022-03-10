@@ -1,4 +1,5 @@
-import { BigInt, ByteArray } from "@graphprotocol/graph-ts";
+import { BigInt, ByteArray, Bytes, JSONValue, log, Value } from "@graphprotocol/graph-ts";
+import { Domain } from "../generated/schema";
 
 export function byteArrayFromHex(s: string): ByteArray {
   if (s.length % 2 !== 0) {
@@ -8,12 +9,13 @@ export function byteArrayFromHex(s: string): ByteArray {
   for (let i = 0; i < s.length; i += 2) {
     out[i / 2] = parseInt(s.substring(i, i + 2), 16) as u32;
   }
-  return out as ByteArray;
+  return changetype<Bytes>(out);
 }
 
-export function uint256ToByteArray(i: BigInt): ByteArray {
-  let hex = i.toHex().slice(2).padStart(64, "0");
-  return byteArrayFromHex(hex);
+export function toPaddedHexString(i: BigInt): string {
+  let hex = i.toHex();
+  let padded = hex.substr(0, 2) + hex.substr(2).padStart(64, "0");
+  return padded;
 }
 
 export function containsAny(target: string, search: string): boolean {
@@ -24,4 +26,25 @@ export function containsAny(target: string, search: string): boolean {
   }
 
   return false;
+}
+
+export function handleMetadata(domain: Domain, value: JSONValue): void {
+  let obj = value.toObject();
+
+  let name = obj.get("name");
+  if (name && !name.isNull()) {
+    domain.metadataName = name.toString();
+  }
+
+  let image = obj.get("image");
+  if (image && !image.isNull()) {
+    domain.metadataImage = image.toString();
+  }
+
+  let animation = obj.get("animation_url");
+  if (animation && !animation.isNull()) {
+    domain.metadataAnimation = animation.toString();
+  }
+
+  domain.save();
 }

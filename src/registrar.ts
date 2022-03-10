@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, ipfs, json, JSONValue, log, Value } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
@@ -8,6 +8,7 @@ import {
   Registrar,
   MetadataUnlocked,
   MetadataLocked,
+  DomainCreated1,
 } from "../generated/Registrar/Registrar";
 import {
   Account,
@@ -18,64 +19,87 @@ import {
   DomainRoyaltyChanged,
   DomainMinted,
   Global,
+  RegistrarContract,
 } from "../generated/schema";
+import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
+import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
-import { uint256ToByteArray, containsAny } from "./utils";
+import { toPaddedHexString, containsAny, handleMetadata } from "./utils";
 
-// event DomainCreated(
-//   uint256 indexed id,
-//   string name,
-//   uint256 indexed nameHash,
-//   uint256 indexed parent,
-//   address minter,
-//   address controller
-// );
-export function handleDomainCreated(event: DomainCreated): void {
+export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
   account.save();
 
   let global = Global.load("1");
-  if (global == null) {
+  if (global === null) {
     global = new Global("1");
     global.domainCount = 0;
   }
   global.domainCount += 1;
   global.save();
 
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
+  let registrarContract = new RegistrarContract(getDefaultRegistrarForNetwork().toHexString());
+  registrarContract.rootDomain = "0x0";
+  registrarContract.save();
+
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId)!;
   domain.indexId = global.domainCount;
 
-  let parentId = uint256ToByteArray(event.params.parent);
-  let domainParent = Domain.load(parentId.toHex());
+  let parentId = toPaddedHexString(event.params.parent);
+  let domainParent = Domain.load(parentId);
+  if (domainParent == null) {
+    log.log(log.Level.WARNING, "no parent of: " + parentId);
+    domainParent = new Domain(parentId);
+  }
   domain.owner = account.id;
   domain.minter = account.id;
 
-  let hasBadCharacters = containsAny(event.params.name, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
+  let hasBadCharacters = containsAny(event.params.label, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
   if (hasBadCharacters) {
     return;
   }
 
-  if (domainParent.name == null) {
-    domain.name = event.params.name;
+  if (domainParent.name === null) {
+    domain.name = event.params.label;
   } else {
-    domain.name = domainParent.name + "." + event.params.name;
+    domain.name = domainParent.name + "." + event.params.label;
   }
-  domain.label = event.params.name;
-  domain.labelHash = event.params.nameHash.toHex();
-  domain.parent = parentId.toHex();
+  domain.label = event.params.label;
+  domain.labelHash = event.params.labelHash.toHex();
+  domain.parent = parentId;
   domain.metadata = event.params.metadataUri;
   domain.creationTimestamp = event.block.timestamp;
   domain.royaltyAmount = event.params.royaltyAmount;
 
   let registrar = Registrar.bind(event.address);
   domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
-  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toString();
-
+  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toHexString();
+  domain.contract = getDefaultRegistrarForNetwork().toHexString();
   domain.save();
 
-  let mintedEvent = new DomainMinted(domainId.toHex());
-  mintedEvent.domain = domainId.toHex();
+  let reg = new RegExp(".+(Qm.+)");
+  let match = reg.exec(event.params.metadataUri);
+  if (match) {
+    let qmLocation = match.matches[1];
+    let contents = ipfs.cat(qmLocation);
+    if (contents) {
+      let metadataContents = contents.toString();
+      domain.metadataContents = metadataContents;
+      domain.save();
+
+      let metadataAsJson = json.try_fromBytes(contents);
+      if (metadataAsJson.isOk) {
+        handleMetadata(domain, metadataAsJson.value);
+      }
+    } else {
+      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
+    }
+  }
+  domain.save();
+
+  let mintedEvent = new DomainMinted(domainId);
+  mintedEvent.domain = domainId;
   mintedEvent.blockNumber = event.block.number.toI32();
   mintedEvent.transactionID = event.transaction.hash;
   mintedEvent.timestamp = event.block.timestamp;
@@ -90,20 +114,27 @@ export function handleTransfer(event: Transfer): void {
   let fromAccount = new Account(event.params.from.toHex());
   fromAccount.save();
 
-  let domainId = uint256ToByteArray(event.params.tokenId);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let registrarContract = new RegistrarContract(getDefaultRegistrarForNetwork().toHexString());
+  registrarContract.rootDomain = "0x0";
+  registrarContract.save();
+
+  let domainId = toPaddedHexString(event.params.tokenId);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
     domain.isLocked = false;
     domain.royaltyAmount = BigInt.fromI32(0);
   }
   domain.owner = account.id;
+  if (domain.contract === null) {
+    domain.contract = getDefaultRegistrarForNetwork().toHexString();
+  }
   domain.save();
 
   let transferEvent = new DomainTransferred(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  transferEvent.domain = domainId.toHex();
+  transferEvent.domain = domainId;
   transferEvent.blockNumber = event.block.number.toI32();
   transferEvent.transactionID = event.transaction.hash;
   transferEvent.timestamp = event.block.timestamp;
@@ -113,18 +144,38 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleMetadataChanged(event: MetadataChanged): void {
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
   }
   domain.metadata = event.params.uri;
+  domain.save();
+
+  let reg = new RegExp(".+(Qm.+)");
+  let match = reg.exec(event.params.uri);
+  if (match) {
+    let qmLocation = match.matches[1];
+    let contents = ipfs.cat(qmLocation);
+    if (contents) {
+      let metadataContents = contents.toString();
+      domain.metadataContents = metadataContents;
+      domain.save();
+
+      let metadataAsJson = json.try_fromBytes(contents);
+      if (metadataAsJson.isOk) {
+        handleMetadata(domain, metadataAsJson.value);
+      }
+    } else {
+      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
+    }
+  }
   domain.save();
 
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dmc.domain = domainId.toHex();
+  dmc.domain = domainId;
   dmc.blockNumber = event.block.number.toI32();
   dmc.transactionID = event.transaction.hash;
   dmc.timestamp = event.block.timestamp;
@@ -137,10 +188,10 @@ export function handleMetadataLockChanged(event: MetadataLockChanged): void {
   let account = new Account(event.params.locker.toHex());
   account.save();
 
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
   }
   domain.isLocked = event.params.isLocked;
   domain.lockedBy = account.id;
@@ -149,7 +200,7 @@ export function handleMetadataLockChanged(event: MetadataLockChanged): void {
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dml.domain = domainId.toHex();
+  dml.domain = domainId;
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
@@ -158,10 +209,10 @@ export function handleMetadataLockChanged(event: MetadataLockChanged): void {
 }
 
 export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): void {
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
   }
   domain.royaltyAmount = event.params.amount;
   domain.save();
@@ -169,7 +220,7 @@ export function handleRoyaltiesAmountChanged(event: RoyaltiesAmountChanged): voi
   let drc = new DomainRoyaltyChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  drc.domain = domainId.toHex();
+  drc.domain = domainId;
   drc.blockNumber = event.block.number.toI32();
   drc.transactionID = event.transaction.hash;
   drc.timestamp = event.block.timestamp;
@@ -181,10 +232,10 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   let account = new Account(event.params.locker.toHex());
   account.save();
 
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
   }
   domain.isLocked = true;
   domain.lockedBy = account.id;
@@ -193,7 +244,7 @@ export function handleMetadataLocked(event: MetadataLocked): void {
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dml.domain = domainId.toHex();
+  dml.domain = domainId;
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
@@ -202,10 +253,10 @@ export function handleMetadataLocked(event: MetadataLocked): void {
 }
 
 export function handleMetadataUnlocked(event: MetadataUnlocked): void {
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
-  if (domain == null) {
-    domain = new Domain(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (domain === null) {
+    domain = new Domain(domainId);
   }
   domain.isLocked = false;
   domain.lockedBy = null;
@@ -214,7 +265,7 @@ export function handleMetadataUnlocked(event: MetadataUnlocked): void {
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
-  dml.domain = domainId.toHex();
+  dml.domain = domainId;
   dml.blockNumber = event.block.number.toI32();
   dml.transactionID = event.transaction.hash;
   dml.timestamp = event.block.timestamp;
@@ -226,11 +277,11 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   let account = new Account(event.params.minter.toHex());
   account.save();
 
-  let domainId = uint256ToByteArray(event.params.id);
-  let domain = Domain.load(domainId.toHex());
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId)!;
 
   let global = Global.load("1");
-  if (global == null) {
+  if (global === null) {
     global = new Global("1");
     global.domainCount = 0;
   }
@@ -239,8 +290,8 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
 
   domain.indexId = global.domainCount;
 
-  let parentId = uint256ToByteArray(event.params.parent);
-  let domainParent = Domain.load(parentId.toHex());
+  let parentId = toPaddedHexString(event.params.parent);
+  let domainParent = Domain.load(parentId)!;
   domain.owner = account.id;
   domain.minter = account.id;
 
@@ -249,20 +300,20 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
     return;
   }
 
-  if (domainParent.name == null) {
+  if (domainParent.name === null) {
     domain.name = event.params.name;
   } else {
     domain.name = domainParent.name + "." + event.params.name;
   }
   domain.label = event.params.name;
   domain.labelHash = event.params.nameHash.toHex();
-  domain.parent = parentId.toHex();
+  domain.parent = parentId;
   domain.creationTimestamp = event.block.timestamp;
 
   domain.save();
 
-  let mintedEvent = new DomainMinted(domainId.toHex());
-  mintedEvent.domain = domainId.toHex();
+  let mintedEvent = new DomainMinted(domainId);
+  mintedEvent.domain = domainId;
   mintedEvent.blockNumber = event.block.number.toI32();
   mintedEvent.transactionID = event.transaction.hash;
   mintedEvent.timestamp = event.block.timestamp;
