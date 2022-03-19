@@ -30,21 +30,12 @@ export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
   account.save();
 
-  let global = Global.load("1");
-  if (global === null) {
-    global = new Global("1");
-    global.domainCount = 0;
-  }
-  global.domainCount += 1;
-  global.save();
-
   let registrarContract = new RegistrarContract(getDefaultRegistrarForNetwork().toHexString());
   registrarContract.rootDomain = "0x0";
   registrarContract.save();
 
   let domainId = toPaddedHexString(event.params.id);
   let domain = Domain.load(domainId)!;
-  domain.indexId = global.domainCount;
 
   let parentId = toPaddedHexString(event.params.parent);
   let domainParent = Domain.load(parentId);
@@ -58,6 +49,18 @@ export function handleDomainCreated(event: DomainCreated1): void {
   let hasBadCharacters = containsAny(event.params.label, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
   if (hasBadCharacters) {
     return;
+  }
+
+  if (!domain.indexId) {
+    let global = Global.load("1");
+    if (global === null) {
+      global = new Global("1");
+      global.domainCount = 0;
+    }
+    global.domainCount += 1;
+    global.save();
+
+    domain.indexId = global.domainCount;
   }
 
   if (domainParent.name === null) {
@@ -280,16 +283,6 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   let domainId = toPaddedHexString(event.params.id);
   let domain = Domain.load(domainId)!;
 
-  let global = Global.load("1");
-  if (global === null) {
-    global = new Global("1");
-    global.domainCount = 0;
-  }
-  global.domainCount += 1;
-  global.save();
-
-  domain.indexId = global.domainCount;
-
   let parentId = toPaddedHexString(event.params.parent);
   let domainParent = Domain.load(parentId)!;
   domain.owner = account.id;
@@ -298,6 +291,18 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   let hasBadCharacters = containsAny(event.params.name, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
   if (hasBadCharacters) {
     return;
+  }
+
+  if (!domain.indexId) {
+    let global = Global.load("1");
+    if (global === null) {
+      global = new Global("1");
+      global.domainCount = 0;
+    }
+    global.domainCount += 1;
+    global.save();
+
+    domain.indexId = global.domainCount;
   }
 
   if (domainParent.name === null) {
