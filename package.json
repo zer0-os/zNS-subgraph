@@ -2,9 +2,11 @@
   "name": "zNS-subgraph",
   "license": "MIT",
   "scripts": {
-    "prepare:kovan": "mustache config/kovan.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:kovan": "mustache config/kovan.json subgraph.template.yaml > subgraph.yaml && mustache config/kovan.json src/defaultRegistrar.ts.template > src/defaultRegistrar.ts",
+    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml && mustache config/rinkeby.json src/defaultRegistrar.ts.template > src/defaultRegistrar.ts",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml && mustache config/mainnet.json src/defaultRegistrar.ts.template > src/defaultRegistrar.ts",
     "deploy:kovan": "yarn prepare:kovan && yarn internal:deploy",
+    "deploy:rinkeby": "yarn prepare:rinkeby && yarn internal:deploy",
     "deploy:mainnet": "yarn prepare:mainnet && yarn internal:deploy",
     "codegen": "graph codegen",
     "build": "graph build",
@@ -17,8 +19,9 @@
     "lint-fix": "yarn lint --fix"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.20.0",
-    "@graphprotocol/graph-ts": "0.20.0"
+    "@graphprotocol/graph-cli": "0.25.0",
+    "@graphprotocol/graph-ts": "0.25.0",
+    "assemblyscript-regex": "^1.6.4"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.19.0",
@@ -26,8 +29,8 @@
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "mustache": "^4.2.0",
     "prettier": "^2.2.1",
-    "typescript": "^4.2.3",
-    "mustache": "^4.2.0"
+    "typescript": "^4.2.3"
   }
 }

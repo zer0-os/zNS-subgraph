@@ -9,13 +9,18 @@ type Domain @entity {
   owner: Account
   minter: Account
   lockedBy: Account
-  isLocked: Boolean!
+  isLocked: Boolean
   metadata: String
-  royaltyAmount: BigInt!
+  metadataContents: String
+  metadataName: String
+  metadataImage: String
+  metadataAnimation: String
+  royaltyAmount: BigInt
   creationTimestamp: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
   nonce: BigInt
   requests: [DomainRequest!]! @derivedFrom(field: "parent")
+  contract: RegistrarContract
 }
 
 interface DomainEvent {
@@ -96,4 +101,10 @@ type DomainRequest @entity {
 type Global @entity {
   id: ID!
   domainCount: Int!
+}
+
+type RegistrarContract @entity {
+  id: ID!
+  rootDomain: Domain
+  domains: [Domain!]! @derivedFrom(field: "contract")
 }
