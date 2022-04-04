@@ -2,6 +2,6 @@
   "network": "mainnet",
   "registrar_address": "0xc2e9678A71e50E5AEd036e00e9c5caeb1aC5987D",
   "start_block": 12562654,
-  "hub_address": "0x3F0d0a0051D1E600B3f6B35a07ae7A64eD1A10Ca",
-  "hub_start_block": 14413772
+  "hub_address": "0x6141d5Cb3517215A03519A464bF9C39814df7479",
+  "hub_start_block": 14432315
 }

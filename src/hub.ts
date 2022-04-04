@@ -78,11 +78,6 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toString();
   domain.contract = event.params.registrar.toHexString();
 
-  if (domain.contract == getDefaultRegistrarForNetwork().toHexString()) {
-    // Transfer event was handled by the original registrar event handlers
-    return;
-  }
-
   let reg = new RegExp(".+(Qm.+)");
   let match = reg.exec(event.params.metadataUri);
   if (match) {
@@ -144,11 +139,6 @@ export function handleMetadataChanged(event: EEMetadataChanged): void {
 
   domain.save();
 
-  if (domain.contract == getDefaultRegistrarForNetwork().toHexString()) {
-    // Transfer event was handled by the original registrar event handlers
-    return;
-  }
-
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
@@ -176,11 +166,6 @@ export function handleMetadataLockChanged(event: EEMetadataLockChanged): void {
   domain.lockedBy = account.id;
   domain.save();
 
-  if (domain.contract == getDefaultRegistrarForNetwork().toHexString()) {
-    // Transfer event was handled by the original registrar event handlers
-    return;
-  }
-
   let dml = new DomainMetadataLocked(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
@@ -207,11 +192,6 @@ export function handleRoyaltiesAmountChanged(event: EERoyaltiesAmountChanged): v
   }
   domain.royaltyAmount = event.params.amount;
   domain.save();
-
-  if (domain.contract == getDefaultRegistrarForNetwork().toHexString()) {
-    // Transfer event was handled by the original registrar event handlers
-    return;
-  }
 
   let drc = new DomainRoyaltyChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
