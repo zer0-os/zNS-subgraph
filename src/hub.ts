@@ -230,6 +230,11 @@ export function handleTransferV1(event: EETransferV1): void {
     return;
   }
 
+  // ignore transfers to self
+  if (event.params.to == event.params.from) {
+    return;
+  }
+
   let transferEvent = new DomainTransferred(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );

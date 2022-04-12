@@ -134,6 +134,11 @@ export function handleTransfer(event: Transfer): void {
   }
   domain.save();
 
+  // ignore transfers to self
+  if (event.params.to == event.params.from) {
+    return;
+  }
+
   let transferEvent = new DomainTransferred(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
   );
