@@ -75,6 +75,8 @@ dataSources:
       eventHandlers:
         - event: EEDomainCreatedV2(address,indexed uint256,string,indexed uint256,indexed uint256,address,address,string,uint256)
           handler: handleDomainCreatedV2
+        - event: EEDomainCreatedV3(address,indexed uint256,string,indexed uint256,indexed uint256,address,address,string,uint256,uint256,uint256)
+          handler: handleDomainCreatedV3
         - event: EEMetadataChanged(address,indexed uint256,string)
           handler: handleMetadataChanged
         - event: EEMetadataLockChanged(address,indexed uint256,address,bool)
@@ -85,4 +87,6 @@ dataSources:
           handler: handleRoyaltiesAmountChanged
         - event: EETransferV1(address,indexed address,indexed address,indexed uint256)
           handler: handleTransferV1
+        - event: EEDomainGroupUpdatedV1(address,uint256,string)
+          handler: handleDomainGroupUpdatedV1
       file: ./src/hub.ts

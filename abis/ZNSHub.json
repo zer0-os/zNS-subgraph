@@ -82,6 +82,104 @@
         {
           "indexed": false,
           "internalType": "string",
+          "name": "label",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "labelHash",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "parent",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "minter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "controller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadataUri",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "royaltyAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "groupId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "groupFileIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "EEDomainCreatedV3",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "parentRegistrar",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "folderGroupId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "baseUri",
+          "type": "string"
+        }
+      ],
+      "name": "EEDomainGroupUpdatedV1",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "registrar",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
           "name": "uri",
           "type": "string"
         }
@@ -356,6 +454,16 @@
           "internalType": "uint256",
           "name": "royaltyAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "groupId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "groupFileIndex",
+          "type": "uint256"
         }
       ],
       "name": "domainCreated",
@@ -380,6 +488,24 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "folderGroupId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "baseUri",
+          "type": "string"
+        }
+      ],
+      "name": "domainGroupUpdated",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -554,6 +680,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "domainId",
+          "type": "uint256"
+        }
+      ],
+      "name": "parentOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "registrarBeacon",
       "outputs": [
@@ -600,6 +745,19 @@
         }
       ],
       "name": "royaltiesAmountChanged",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "defaultRegistrar_",
+          "type": "address"
+        }
+      ],
+      "name": "setDefaultRegistrar",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

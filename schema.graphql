@@ -21,6 +21,8 @@ type Domain @entity {
   nonce: BigInt
   requests: [DomainRequest!]! @derivedFrom(field: "parent")
   contract: RegistrarContract
+  domainGroup: DomainGroup
+  domainGroupIndex: BigInt
 }
 
 interface DomainEvent {
@@ -107,4 +109,13 @@ type RegistrarContract @entity {
   id: ID!
   rootDomain: Domain
   domains: [Domain!]! @derivedFrom(field: "contract")
+  groups: [DomainGroup!]! @derivedFrom(field: "registrar")
+}
+
+type DomainGroup @entity {
+  id: ID!
+  groupId: BigInt!
+  registrar: RegistrarContract!
+  baseUri: String!
+  domains: [Domain!]! @derivedFrom(field: "domainGroup")
 }

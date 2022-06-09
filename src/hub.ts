@@ -10,9 +10,12 @@ import {
   DomainMinted,
   Global,
   RegistrarContract,
+  DomainGroup,
 } from "../generated/schema";
 import {
   EEDomainCreatedV2,
+  EEDomainCreatedV3,
+  EEDomainGroupUpdatedV1,
   EEMetadataChanged,
   EEMetadataLockChanged,
   EENewSubdomainRegistrar,
@@ -20,7 +23,13 @@ import {
   EETransferV1,
 } from "../generated/ZNSHub/ZNSHub";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
-import { containsAny, handleMetadata, toPaddedHexString } from "./utils";
+import {
+  containsAny,
+  domainGroupId as generateDomainGroupId,
+  fetchAndSaveDomainMetadata,
+  handleMetadata,
+  toPaddedHexString,
+} from "./utils";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
 export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
@@ -75,29 +84,95 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
 
   let registrar = Registrar.bind(event.params.registrar);
   domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
-  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toString();
-  domain.contract = event.params.registrar.toHexString();
+  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toHex();
+  domain.contract = event.params.registrar.toHex();
+  domain.save();
 
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.metadataUri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
+  fetchAndSaveDomainMetadata(domain);
 
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
+  let mintedEvent = new DomainMinted(domainId);
+  mintedEvent.domain = domainId;
+  mintedEvent.blockNumber = event.block.number.toI32();
+  mintedEvent.transactionID = event.transaction.hash;
+  mintedEvent.timestamp = event.block.timestamp;
+  mintedEvent.minter = event.params.minter.toHex();
+  mintedEvent.save();
+}
+
+export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
+  let account = new Account(event.params.minter.toHex());
+  account.save();
+
+  let registrarContract = new RegistrarContract(event.params.registrar.toHexString());
+  registrarContract.save();
+
+  let domainId = toPaddedHexString(event.params.id);
+  let domain = Domain.load(domainId);
+  if (!domain) {
+    domain = new Domain(domainId);
   }
 
+  let parentId = toPaddedHexString(event.params.parent);
+  let domainParent = Domain.load(parentId);
+  if (!domainParent) {
+    domainParent = new Domain(parentId);
+  }
+  domain.owner = account.id;
+  domain.minter = account.id;
+
+  let hasBadCharacters = containsAny(event.params.label, "\n,./<>?;':\"[]{}=+`~!@#$%^&*()|\\ ");
+  if (hasBadCharacters) {
+    return;
+  }
+
+  if (!domain.indexId) {
+    let global = Global.load("1");
+    if (global === null) {
+      global = new Global("1");
+      global.domainCount = 0;
+    }
+    global.domainCount += 1;
+    global.save();
+
+    domain.indexId = global.domainCount;
+  }
+
+  if (domainParent.name == null) {
+    domain.name = event.params.label;
+  } else {
+    domain.name = domainParent.name + "." + event.params.label;
+  }
+  domain.label = event.params.label;
+  domain.labelHash = event.params.labelHash.toHex();
+  domain.parent = parentId;
+  domain.creationTimestamp = event.block.timestamp;
+  domain.royaltyAmount = event.params.royaltyAmount;
+
+  // domain groups
+  const domainGroupId = generateDomainGroupId(event.params.registrar, event.params.groupId);
+  domain.domainGroup = domainGroupId;
+  domain.domainGroupIndex = event.params.groupFileIndex;
+
+  if (domain.domainGroup == generateDomainGroupId(event.params.registrar, BigInt.fromI32(0))) {
+    // not in a domain group
+    domain.metadata = event.params.metadataUri;
+  } else {
+    // in a domain group
+    let domainGroup = DomainGroup.load(domainGroupId);
+    if (!domainGroup) {
+      throw new Error("Expected domain group entity not found for " + domainGroupId);
+    }
+
+    domain.metadata = domainGroup.baseUri + domain.domainGroupIndex!.toString();
+  }
+
+  let registrar = Registrar.bind(event.params.registrar);
+  domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
+  domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toHex();
+  domain.contract = event.params.registrar.toHexString();
   domain.save();
+
+  fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -117,27 +192,9 @@ export function handleMetadataChanged(event: EEMetadataChanged): void {
     domain.royaltyAmount = BigInt.fromI32(0);
   }
   domain.metadata = event.params.uri;
-
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.uri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
-
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
-  }
-
   domain.save();
+
+  fetchAndSaveDomainMetadata(domain);
 
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
@@ -245,4 +302,44 @@ export function handleTransferV1(event: EETransferV1): void {
   transferEvent.from = event.params.from.toHex() !== null ? event.params.from.toHex() : "0x0";
   transferEvent.to = event.params.to.toHex();
   transferEvent.save();
+}
+
+export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void {
+  const id = generateDomainGroupId(event.params.parentRegistrar, event.params.folderGroupId);
+
+  let group = DomainGroup.load(id);
+  const newGroup = !group;
+  if (!group) {
+    group = new DomainGroup(id);
+    group.groupId = event.params.folderGroupId;
+    group.registrar = event.params.parentRegistrar.toHex();
+  }
+
+  group.baseUri = event.params.baseUri;
+  group.save();
+
+  if (!newGroup) {
+    for (let i = 0; i < group.domains.length; ++i) {
+      let domain = Domain.load(group.domains[i]);
+      if (!domain) {
+        continue;
+      }
+
+      if (domain.domainGroupIndex === null) {
+        log.log(
+          log.Level.WARNING,
+          "No domain group index set for " +
+            domain.id +
+            " but it is in domain group " +
+            domain.domainGroup!,
+        );
+        continue;
+      }
+
+      domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
+      domain.save();
+
+      fetchAndSaveDomainMetadata(domain);
+    }
+  }
 }
