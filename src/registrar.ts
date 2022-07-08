@@ -22,7 +22,6 @@ import {
   RegistrarContract,
 } from "../generated/schema";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
-import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
 import { toPaddedHexString, containsAny, handleMetadata } from "./utils";
 
@@ -79,26 +78,6 @@ export function handleDomainCreated(event: DomainCreated1): void {
   domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
   domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toHexString();
   domain.contract = getDefaultRegistrarForNetwork().toHexString();
-  domain.save();
-
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.metadataUri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
-
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
-  }
   domain.save();
 
   let mintedEvent = new DomainMinted(domainId);
@@ -158,26 +137,6 @@ export function handleMetadataChanged(event: MetadataChanged): void {
     domain = new Domain(domainId);
   }
   domain.metadata = event.params.uri;
-  domain.save();
-
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.uri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
-
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
-  }
   domain.save();
 
   let dmc = new DomainMetadataChanged(

@@ -88,7 +88,7 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   domain.contract = event.params.registrar.toHex();
   domain.save();
 
-  fetchAndSaveDomainMetadata(domain);
+  //fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -161,12 +161,13 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     const domainGroup = DomainGroup.load(domainGroupId);
     if (!domainGroup) {
       log.error("Expected domain group entity not found for {}", [domainGroupId]);
-      // throw new Error("Expected domain group entity not found for " + domainGroupId);
     }
 
-    let thing = domainGroup ? domainGroup.baseUri : "";
+    // Default to nothing in case it wasn't found, yes this won't be anything
+    // but it prevents an indexer error
+    const metadataUriBase = domainGroup ? domainGroup.baseUri : "";
 
-    domain.metadata = thing + domain.domainGroupIndex!.toString();
+    domain.metadata = metadataUriBase + domain.domainGroupIndex!.toString();
   }
 
   let registrar = Registrar.bind(event.params.registrar);
@@ -175,7 +176,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   domain.contract = event.params.registrar.toHexString();
   domain.save();
 
-  fetchAndSaveDomainMetadata(domain);
+  //fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -197,7 +198,7 @@ export function handleMetadataChanged(event: EEMetadataChanged): void {
   domain.metadata = event.params.uri;
   domain.save();
 
-  fetchAndSaveDomainMetadata(domain);
+  //fetchAndSaveDomainMetadata(domain);
 
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
@@ -342,7 +343,7 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
       domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
       domain.save();
 
-      fetchAndSaveDomainMetadata(domain);
+      //fetchAndSaveDomainMetadata(domain);
     }
   }
 }
