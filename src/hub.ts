@@ -158,12 +158,15 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     domain.metadata = event.params.metadataUri;
   } else {
     // in a domain group
-    let domainGroup = DomainGroup.load(domainGroupId);
+    const domainGroup = DomainGroup.load(domainGroupId);
     if (!domainGroup) {
-      throw new Error("Expected domain group entity not found for " + domainGroupId);
+      log.error("Expected domain group entity not found for {}", [domainGroupId]);
+      // throw new Error("Expected domain group entity not found for " + domainGroupId);
     }
 
-    domain.metadata = domainGroup.baseUri + domain.domainGroupIndex!.toString();
+    let thing = domainGroup ? domainGroup.baseUri : "";
+
+    domain.metadata = thing + domain.domainGroupIndex!.toString();
   }
 
   let registrar = Registrar.bind(event.params.registrar);
