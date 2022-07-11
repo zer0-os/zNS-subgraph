@@ -150,7 +150,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     // but it prevents an indexer error
     const metadataUriBase = domainGroup ? domainGroup.baseUri : "";
 
-    domain.metadata = metadataUriBase + domain.domainGroupIndex!.toString();
+    domain.metadata = metadataUriBase + domain.domainGroupIndex.toString();
   }
 
   let registrar = Registrar.bind(event.params.registrar);
@@ -159,7 +159,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   domain.contract = event.params.registrar.toHexString();
   domain.save();
 
-  //fetchAndSaveDomainMetadata(domain);
+  // fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -318,12 +318,12 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
           "No domain group index set for " +
             domain.id +
             " but it is in domain group " +
-            domain.domainGroup!,
+            domain.domainGroup,
         );
         continue;
       }
 
-      domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
+      domain.metadata = group.baseUri + domain.domainGroupIndex.toString();
       domain.save();
 
       // fetchAndSaveDomainMetadata(domain);
@@ -331,6 +331,7 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
   }
 }
 
+/* eslint-disable */
 export function refreshMetadataV0(event: EERefreshMetadata): void {
   let global = getGlobalTracker();
   let allDomains = global.domainsViaIndex;
@@ -343,3 +344,4 @@ export function refreshMetadataV0(event: EERefreshMetadata): void {
     domain.save();
   }
 }
+/* eslint-enable */

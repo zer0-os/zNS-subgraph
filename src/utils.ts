@@ -92,15 +92,6 @@ export function fetchAndSaveDomainMetadata(domain: Domain): void {
   }
 }
 
-export function setupGlobalTracker(domain: Domain): void {
-  let global = getGlobalTracker();
-  global.domainCount += 1;
-  global.save();
-
-  domain.indexId = global.domainCount;
-  global.domainsViaIndex.push(domain.id);
-}
-
 export function getGlobalTracker(): Global {
   let global = Global.load("1");
   if (global === null) {
@@ -110,4 +101,13 @@ export function getGlobalTracker(): Global {
   }
 
   return global;
+}
+
+export function setupGlobalTracker(domain: Domain): void {
+  let global = getGlobalTracker();
+  global.domainCount += 1;
+  global.save();
+
+  domain.indexId = global.domainCount;
+  global.domainsViaIndex.push(domain.id);
 }
