@@ -1,4 +1,4 @@
-import { BigInt, ipfs, json, JSONValue, log, Value } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
@@ -22,7 +22,7 @@ import {
 } from "../generated/schema";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
 
-import { toPaddedHexString, containsAny, handleMetadata, setupGlobalTracker } from "./utils";
+import { toPaddedHexString, containsAny, setupGlobalTracker } from "./utils";
 
 export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
@@ -33,11 +33,15 @@ export function handleDomainCreated(event: DomainCreated1): void {
   registrarContract.save();
 
   let domainId = toPaddedHexString(event.params.id);
-  let domain = Domain.load(domainId)!;
+  let domain = Domain.load(domainId);
+
+  if (!domain) {
+    throw Error(`Domain with domainId: ${domainId} not found.`);
+  }
 
   let parentId = toPaddedHexString(event.params.parent);
   let domainParent = Domain.load(parentId);
-  if (domainParent == null) {
+  if (!domainParent) {
     log.log(log.Level.WARNING, "no parent of: " + parentId);
     domainParent = new Domain(parentId);
   }
@@ -236,10 +240,19 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   account.save();
 
   let domainId = toPaddedHexString(event.params.id);
-  let domain = Domain.load(domainId)!;
+  let domain = Domain.load(domainId);
+
+  if (!domain) {
+    throw Error(`Legacy domain with domainId: ${domainId} not found.`);
+  }
 
   let parentId = toPaddedHexString(event.params.parent);
-  let domainParent = Domain.load(parentId)!;
+  let domainParent = Domain.load(parentId);
+
+  if (!domainParent) {
+    throw Error(`Legacy domain parent with domainId: ${domainId} not found.`);
+  }
+
   domain.owner = account.id;
   domain.minter = account.id;
 

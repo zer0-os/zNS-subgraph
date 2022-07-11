@@ -7,7 +7,6 @@ import {
   json,
   JSONValue,
   log,
-  Value,
 } from "@graphprotocol/graph-ts";
 import { Domain, Global } from "../generated/schema";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";

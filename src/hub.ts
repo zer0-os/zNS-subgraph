@@ -1,4 +1,4 @@
-import { Address, BigInt, ipfs, json, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Registrar } from "../generated/Registrar/Registrar";
 import {
   Account,
@@ -19,7 +19,6 @@ import {
   EEMetadataLockChanged,
   EENewSubdomainRegistrar,
   EERefreshMetadata,
-  EERefreshMetadata__Params,
   EERoyaltiesAmountChanged,
   EETransferV1,
 } from "../generated/ZNSHub/ZNSHub";
@@ -27,13 +26,10 @@ import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
 import {
   containsAny,
   domainGroupId as generateDomainGroupId,
-  fetchAndSaveDomainMetadata,
   getGlobalTracker,
-  handleMetadata,
   setupGlobalTracker,
   toPaddedHexString,
 } from "./utils";
-import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
 export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   let account = new Account(event.params.minter.toHex());
@@ -83,7 +79,7 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   domain.contract = event.params.registrar.toHex();
   domain.save();
 
-  //fetchAndSaveDomainMetadata(domain);
+  // fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -154,7 +150,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     // but it prevents an indexer error
     const metadataUriBase = domainGroup ? domainGroup.baseUri : "";
 
-    domain.metadata = metadataUriBase + domain.domainGroupIndex!.toString();
+    domain.metadata = metadataUriBase + domain.domainGroupIndex.toString();
   }
 
   let registrar = Registrar.bind(event.params.registrar);
@@ -163,7 +159,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   domain.contract = event.params.registrar.toHexString();
   domain.save();
 
-  fetchAndSaveDomainMetadata(domain);
+  //fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -185,7 +181,7 @@ export function handleMetadataChanged(event: EEMetadataChanged): void {
   domain.metadata = event.params.uri;
   domain.save();
 
-  fetchAndSaveDomainMetadata(domain);
+  // fetchAndSaveDomainMetadata(domain);
 
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
@@ -322,15 +318,15 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
           "No domain group index set for " +
             domain.id +
             " but it is in domain group " +
-            domain.domainGroup!,
+            domain.domainGroup,
         );
         continue;
       }
 
-      domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
+      domain.metadata = group.baseUri + domain.domainGroupIndex.toString();
       domain.save();
 
-      //fetchAndSaveDomainMetadata(domain);
+      // fetchAndSaveDomainMetadata(domain);
     }
   }
 }
