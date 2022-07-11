@@ -150,7 +150,11 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     // but it prevents an indexer error
     const metadataUriBase = domainGroup ? domainGroup.baseUri : "";
 
-    domain.metadata = metadataUriBase + domain.domainGroupIndex.toString();
+    domain.metadata = metadataUriBase;
+
+    if (domain.domainGroupIndex) {
+      domain.metadata += domain.domainGroupIndex.toString();
+    }
   }
 
   let registrar = Registrar.bind(event.params.registrar);
@@ -312,14 +316,12 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
         continue;
       }
 
-      if (domain.domainGroupIndex === null) {
-        log.log(
-          log.Level.WARNING,
-          "No domain group index set for " +
-            domain.id +
-            " but it is in domain group " +
-            domain.domainGroup,
-        );
+      if (!domain.domainGroupIndex) {
+        log.warning("No domain group index set for {} but it is in domain group {}", [
+          domain.id,
+          domain.domainGroup! /* eslint-disable-line @typescript-eslint/no-non-null-assertion */,
+        ]);
+
         continue;
       }
 
