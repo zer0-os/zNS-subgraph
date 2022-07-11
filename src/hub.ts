@@ -1,4 +1,4 @@
-import { BigInt, ipfs, json, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ipfs, json, log } from "@graphprotocol/graph-ts";
 import { Registrar } from "../generated/Registrar/Registrar";
 import {
   Account,
@@ -8,7 +8,6 @@ import {
   DomainMetadataLocked,
   DomainRoyaltyChanged,
   DomainMinted,
-  Global,
   RegistrarContract,
   DomainGroup,
 } from "../generated/schema";
@@ -19,6 +18,8 @@ import {
   EEMetadataChanged,
   EEMetadataLockChanged,
   EENewSubdomainRegistrar,
+  EERefreshMetadata,
+  EERefreshMetadata__Params,
   EERoyaltiesAmountChanged,
   EETransferV1,
 } from "../generated/ZNSHub/ZNSHub";
@@ -27,7 +28,9 @@ import {
   containsAny,
   domainGroupId as generateDomainGroupId,
   fetchAndSaveDomainMetadata,
+  getGlobalTracker,
   handleMetadata,
+  setupGlobalTracker,
   toPaddedHexString,
 } from "./utils";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";
@@ -59,15 +62,7 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name == null) {
@@ -126,15 +121,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name == null) {
@@ -176,7 +163,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   domain.contract = event.params.registrar.toHexString();
   domain.save();
 
-  //fetchAndSaveDomainMetadata(domain);
+  fetchAndSaveDomainMetadata(domain);
 
   let mintedEvent = new DomainMinted(domainId);
   mintedEvent.domain = domainId;
@@ -198,7 +185,7 @@ export function handleMetadataChanged(event: EEMetadataChanged): void {
   domain.metadata = event.params.uri;
   domain.save();
 
-  //fetchAndSaveDomainMetadata(domain);
+  fetchAndSaveDomainMetadata(domain);
 
   let dmc = new DomainMetadataChanged(
     event.block.number.toString().concat("-").concat(event.logIndex.toString()),
@@ -345,5 +332,18 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
 
       //fetchAndSaveDomainMetadata(domain);
     }
+  }
+}
+
+export function refreshMetadataV0(event: EERefreshMetadata): void {
+  let global = getGlobalTracker();
+  let allDomains = global.domainsViaIndex;
+  for (let i = 0; i < allDomains.length; ++i) {
+    let domain = Domain.load(allDomains[i])!;
+    let registrar = Registrar.bind(Address.fromString(domain.contract!));
+    let currentTokenUri = registrar.tokenURI(BigInt.fromString(domain.id));
+    domain.metadata = currentTokenUri;
+    log.log(log.Level.INFO, "refreshed " + domain.id);
+    domain.save();
   }
 }

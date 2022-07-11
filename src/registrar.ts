@@ -18,12 +18,11 @@ import {
   DomainMetadataLocked,
   DomainRoyaltyChanged,
   DomainMinted,
-  Global,
   RegistrarContract,
 } from "../generated/schema";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
 
-import { toPaddedHexString, containsAny, handleMetadata } from "./utils";
+import { toPaddedHexString, containsAny, handleMetadata, setupGlobalTracker } from "./utils";
 
 export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
@@ -51,15 +50,7 @@ export function handleDomainCreated(event: DomainCreated1): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name === null) {
@@ -258,15 +249,7 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name === null) {
