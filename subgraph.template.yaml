@@ -89,4 +89,6 @@ dataSources:
           handler: handleTransferV1
         - event: EEDomainGroupUpdatedV1(address,uint256,string)
           handler: handleDomainGroupUpdatedV1
+        - event: EERefreshMetadata(uint256,uint256)
+          handler: refreshMetadataV0
       file: ./src/hub.ts

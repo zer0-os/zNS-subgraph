@@ -1,4 +1,4 @@
-import { BigInt, ipfs, json, JSONValue, log, Value } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
@@ -18,13 +18,11 @@ import {
   DomainMetadataLocked,
   DomainRoyaltyChanged,
   DomainMinted,
-  Global,
   RegistrarContract,
 } from "../generated/schema";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
-import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
-import { toPaddedHexString, containsAny, handleMetadata } from "./utils";
+import { toPaddedHexString, containsAny, setupGlobalTracker } from "./utils";
 
 export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
@@ -35,11 +33,15 @@ export function handleDomainCreated(event: DomainCreated1): void {
   registrarContract.save();
 
   let domainId = toPaddedHexString(event.params.id);
-  let domain = Domain.load(domainId)!;
+  let domain = Domain.load(domainId);
+
+  if (!domain) {
+    throw Error(`Domain with domainId: ${domainId} not found.`);
+  }
 
   let parentId = toPaddedHexString(event.params.parent);
   let domainParent = Domain.load(parentId);
-  if (domainParent == null) {
+  if (!domainParent) {
     log.log(log.Level.WARNING, "no parent of: " + parentId);
     domainParent = new Domain(parentId);
   }
@@ -52,15 +54,7 @@ export function handleDomainCreated(event: DomainCreated1): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name === null) {
@@ -79,26 +73,6 @@ export function handleDomainCreated(event: DomainCreated1): void {
   domain.isLocked = registrar.isDomainMetadataLocked(event.params.id);
   domain.lockedBy = registrar.domainMetadataLockedBy(event.params.id).toHexString();
   domain.contract = getDefaultRegistrarForNetwork().toHexString();
-  domain.save();
-
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.metadataUri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
-
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
-  }
   domain.save();
 
   let mintedEvent = new DomainMinted(domainId);
@@ -158,26 +132,6 @@ export function handleMetadataChanged(event: MetadataChanged): void {
     domain = new Domain(domainId);
   }
   domain.metadata = event.params.uri;
-  domain.save();
-
-  let reg = new RegExp(".+(Qm.+)");
-  let match = reg.exec(event.params.uri);
-  if (match) {
-    let qmLocation = match.matches[1];
-    let contents = ipfs.cat(qmLocation);
-    if (contents) {
-      let metadataContents = contents.toString();
-      domain.metadataContents = metadataContents;
-      domain.save();
-
-      let metadataAsJson = json.try_fromBytes(contents);
-      if (metadataAsJson.isOk) {
-        handleMetadata(domain, metadataAsJson.value);
-      }
-    } else {
-      log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
-    }
-  }
   domain.save();
 
   let dmc = new DomainMetadataChanged(
@@ -286,10 +240,19 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   account.save();
 
   let domainId = toPaddedHexString(event.params.id);
-  let domain = Domain.load(domainId)!;
+  let domain = Domain.load(domainId);
+
+  if (!domain) {
+    throw Error(`Legacy domain with domainId: ${domainId} not found.`);
+  }
 
   let parentId = toPaddedHexString(event.params.parent);
-  let domainParent = Domain.load(parentId)!;
+  let domainParent = Domain.load(parentId);
+
+  if (!domainParent) {
+    throw Error(`Legacy domain parent with domainId: ${domainId} not found.`);
+  }
+
   domain.owner = account.id;
   domain.minter = account.id;
 
@@ -299,15 +262,7 @@ export function handleDomainCreatedLegacy(event: DomainCreated): void {
   }
 
   if (!domain.indexId) {
-    let global = Global.load("1");
-    if (global === null) {
-      global = new Global("1");
-      global.domainCount = 0;
-    }
-    global.domainCount += 1;
-    global.save();
-
-    domain.indexId = global.domainCount;
+    setupGlobalTracker(domain);
   }
 
   if (domainParent.name === null) {

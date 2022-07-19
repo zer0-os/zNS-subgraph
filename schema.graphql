@@ -103,6 +103,7 @@ type DomainRequest @entity {
 type Global @entity {
   id: ID!
   domainCount: Int!
+  domainsViaIndex: [Domain!]!
 }
 
 type RegistrarContract @entity {

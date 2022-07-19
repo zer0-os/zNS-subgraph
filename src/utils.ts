@@ -7,9 +7,8 @@ import {
   json,
   JSONValue,
   log,
-  Value,
 } from "@graphprotocol/graph-ts";
-import { Domain } from "../generated/schema";
+import { Domain, Global } from "../generated/schema";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
 export function byteArrayFromHex(s: string): ByteArray {
@@ -91,4 +90,24 @@ export function fetchAndSaveDomainMetadata(domain: Domain): void {
       log.log(log.Level.WARNING, "unable to fetch ipfs file: " + qmLocation);
     }
   }
+}
+
+export function getGlobalTracker(): Global {
+  let global = Global.load("1");
+  if (global === null) {
+    global = new Global("1");
+    global.domainCount = 0;
+    global.domainsViaIndex = [];
+  }
+
+  return global;
+}
+
+export function setupGlobalTracker(domain: Domain): void {
+  let global = getGlobalTracker();
+  global.domainCount += 1;
+  global.save();
+
+  domain.indexId = global.domainCount;
+  global.domainsViaIndex.push(domain.id);
 }
