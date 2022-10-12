@@ -153,7 +153,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     domain.metadata = metadataUriBase;
 
     if (domain.domainGroupIndex) {
-      domain.metadata += domain.domainGroupIndex.toString();
+      domain.metadata += domain.domainGroupIndex!.toString();
     }
   }
 
@@ -325,7 +325,7 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
         continue;
       }
 
-      domain.metadata = group.baseUri + domain.domainGroupIndex.toString();
+      domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
       domain.save();
 
       // fetchAndSaveDomainMetadata(domain);
