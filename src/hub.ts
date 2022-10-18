@@ -64,7 +64,7 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   if (domainParent.name == null) {
     domain.name = event.params.label;
   } else {
-    domain.name = domainParent.name + "." + event.params.label;
+    domain.name = domainParent.name.concat(".").concat(event.params.label);
   }
   domain.label = event.params.label;
   domain.labelHash = event.params.labelHash.toHex();
@@ -123,7 +123,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   if (domainParent.name == null) {
     domain.name = event.params.label;
   } else {
-    domain.name = domainParent.name + "." + event.params.label;
+    domain.name = domainParent!.name.concat(".").concat(event.params.label);
   }
   domain.label = event.params.label;
   domain.labelHash = event.params.labelHash.toHex();
@@ -153,7 +153,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     domain.metadata = metadataUriBase;
 
     if (domain.domainGroupIndex) {
-      domain.metadata += domain.domainGroupIndex!.toString();
+      domain.metadata.concat(domain.domainGroupIndex!.toString());
     }
   }
 
@@ -321,11 +321,10 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
           domain.id,
           domain.domainGroup! /* eslint-disable-line @typescript-eslint/no-non-null-assertion */,
         ]);
-
         continue;
       }
 
-      domain.metadata = group.baseUri + domain.domainGroupIndex!.toString();
+      domain.metadata = group.baseUri.concat(domain.domainGroupIndex!.toString());
       domain.save();
 
       // fetchAndSaveDomainMetadata(domain);
@@ -342,7 +341,7 @@ export function refreshMetadataV0(event: EERefreshMetadata): void {
     let registrar = Registrar.bind(Address.fromString(domain.contract!));
     let currentTokenUri = registrar.tokenURI(BigInt.fromString(domain.id));
     domain.metadata = currentTokenUri;
-    log.log(log.Level.INFO, "refreshed " + domain.id);
+    log.log(log.Level.INFO, "refreshed ".concat(domain.id));
     domain.save();
   }
 }
