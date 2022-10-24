@@ -136,7 +136,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   domain.domainGroup = domainGroupId;
   domain.domainGroupIndex = event.params.groupFileIndex;
 
-  if (domain.domainGroup == generateDomainGroupId(event.params.registrar, BigInt.fromI32(0))) {
+  if (domainGroupId == generateDomainGroupId(event.params.registrar, BigInt.fromI32(0))) {
     // not in a domain group
     domain.metadata = event.params.metadataUri;
   } else {
@@ -144,16 +144,18 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
     const domainGroup = DomainGroup.load(domainGroupId);
     if (!domainGroup) {
       log.error("Expected domain group entity not found for {}", [domainGroupId]);
-    }
+    } else {
+      // Default to nothing in case it wasn't found, yes this won't be anything
+      // but it prevents an indexer error
+      const metadataUriBase = domainGroup.baseUri;
+      domain.metadata = metadataUriBase.concat(event.params.groupFileIndex.toString());
 
-    // Default to nothing in case it wasn't found, yes this won't be anything
-    // but it prevents an indexer error
-    const metadataUriBase = domainGroup ? domainGroup.baseUri : "";
+      domain.save();
 
-    domain.metadata = metadataUriBase;
-
-    if (domain.domainGroupIndex) {
-      domain.metadata.concat(domain.domainGroupIndex!.toString());
+      let domainsInGroup = domainGroup.domains;
+      domainsInGroup.push(domain.id);
+      domainGroup.domains = domainsInGroup;
+      domainGroup.save();
     }
   }
 
@@ -304,19 +306,26 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
     group = new DomainGroup(id);
     group.groupId = event.params.folderGroupId;
     group.registrar = event.params.parentRegistrar.toHex();
+    group.domains = [];
   }
 
   group.baseUri = event.params.baseUri;
-  group.save();
 
-  if (!newGroup) {
-    for (let i = 0; i < group.domains.length; ++i) {
-      let domain = Domain.load(group.domains[i]);
+  if (!newGroup && group) {
+    const domainsInGroup = group.domains;
+    if (!domainsInGroup) {
+      log.error("No domains in group {}", [group.id]);
+      return;
+    }
+
+    for (let i = 0; i < domainsInGroup.length; ++i) {
+      let domain = Domain.load(domainsInGroup[i]);
       if (!domain) {
         continue;
       }
+      let domainGroupIndex = domain.domainGroupIndex;
 
-      if (!domain.domainGroupIndex) {
+      if (!domainGroupIndex) {
         log.warning("No domain group index set for {} but it is in domain group {}", [
           domain.id,
           domain.domainGroup! /* eslint-disable-line @typescript-eslint/no-non-null-assertion */,
@@ -324,12 +333,14 @@ export function handleDomainGroupUpdatedV1(event: EEDomainGroupUpdatedV1): void 
         continue;
       }
 
-      domain.metadata = group.baseUri.concat(domain.domainGroupIndex!.toString());
+      domain.metadata = event.params.baseUri.concat(domainGroupIndex.toString());
       domain.save();
 
       // fetchAndSaveDomainMetadata(domain);
     }
   }
+
+  group.save();
 }
 
 /* eslint-disable */

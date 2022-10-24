@@ -96,7 +96,7 @@ export function getGlobalTracker(): Global {
   let global = Global.load("1");
   if (global === null) {
     global = new Global("1");
-    global.domainCount = 0;
+    global.domainCount = BigInt.fromI32(0);
     global.domainsViaIndex = [];
   }
 
@@ -105,9 +105,11 @@ export function getGlobalTracker(): Global {
 
 export function setupGlobalTracker(domain: Domain): void {
   let global = getGlobalTracker();
-  global.domainCount += 1;
+  global.domainCount = global.domainCount.plus(BigInt.fromI32(1));
   global.save();
 
   domain.indexId = global.domainCount;
-  global.domainsViaIndex.push(domain.id);
+  let domainsViaIndex = global.domainsViaIndex;
+  domainsViaIndex.push(domain.id);
+  global.domainsViaIndex = domainsViaIndex;
 }

@@ -1,6 +1,6 @@
 type Domain @entity {
   id: ID!
-  indexId: Int
+  indexId: BigInt
   name: String
   labelHash: String
   label: String
@@ -102,7 +102,7 @@ type DomainRequest @entity {
 
 type Global @entity {
   id: ID!
-  domainCount: Int!
+  domainCount: BigInt!
   domainsViaIndex: [Domain!]!
 }
 
@@ -118,5 +118,5 @@ type DomainGroup @entity {
   groupId: BigInt!
   registrar: RegistrarContract!
   baseUri: String!
-  domains: [Domain!]! @derivedFrom(field: "domainGroup")
+  domains: [Domain!]!
 }
