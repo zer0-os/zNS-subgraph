@@ -1,4 +1,4 @@
 import { Address } from "@graphprotocol/graph-ts";
 export function getDefaultRegistrarForNetwork(): Address {
-  return Address.fromString("0xc2e9678A71e50E5AEd036e00e9c5caeb1aC5987D");
+  return Address.fromString("0x009A11617dF427319210e842D6B202f3831e0116");
 }
