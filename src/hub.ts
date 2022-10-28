@@ -64,6 +64,7 @@ export function handleDomainCreatedV2(event: EEDomainCreatedV2): void {
   if (!domainParent.name) {
     domain.name = event.params.label;
   } else {
+    // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
     domain.name = domainParent.name!.concat(".").concat(event.params.label);
   }
   domain.label = event.params.label;
@@ -123,6 +124,7 @@ export function handleDomainCreatedV3(event: EEDomainCreatedV3): void {
   if (!domainParent.name) {
     domain.name = event.params.label;
   } else {
+    // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
     domain.name = domainParent.name!.concat(".").concat(event.params.label);
   }
   domain.label = event.params.label;
