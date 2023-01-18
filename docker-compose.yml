@@ -20,7 +20,7 @@ services:
       postgres_pass: let-me-in
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
-      ethereum: "goerli:https://goerli.infura.io/v3/fa959ead3761429bafa6995a4b25397e"
+      ethereum: "goerli:https://goerli.infura.io/v3/97e75e0bbc6a4419a5dd7fe4a518b917"
       GRAPH_LOG: info
   ipfs:
     image: ipfs/go-ipfs:v0.10.0

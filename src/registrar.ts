@@ -1,4 +1,4 @@
-import { BigInt, log, store, Address } from "@graphprotocol/graph-ts";
+import { BigInt, log, store } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
