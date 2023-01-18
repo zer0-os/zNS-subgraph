@@ -1,4 +1,4 @@
-import { BigInt, log, store } from "@graphprotocol/graph-ts";
+import { BigInt, log, store, Address } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
@@ -97,7 +97,7 @@ export function handleTransfer(event: Transfer): void {
 
   let domainId = toPaddedHexString(event.params.tokenId);
 
-  if (account.id.localeCompare(ADDRESS_ZERO) === 0) {
+  if (event.params.to.equals(ADDRESS_ZERO)) {
     // If burning token, remove domain from store
     store.remove("Domain", domainId);
   } else {

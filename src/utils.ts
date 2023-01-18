@@ -11,7 +11,7 @@ import {
 import { Domain, Global } from "../generated/schema";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
-export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
+export const ADDRESS_ZERO = Address.zero();
 
 export function byteArrayFromHex(s: string): ByteArray {
   if (s.length % 2 !== 0) {
