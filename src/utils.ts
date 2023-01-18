@@ -11,6 +11,8 @@ import {
 import { Domain, Global } from "../generated/schema";
 import { RegExp } from "./lib/assemblyscript-regex/assembly";
 
+export const ADDRESS_ZERO = Address.zero();
+
 export function byteArrayFromHex(s: string): ByteArray {
   if (s.length % 2 !== 0) {
     throw new TypeError("Hex string must have an even number of characters");

@@ -1,4 +1,4 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, log, store } from "@graphprotocol/graph-ts";
 import {
   DomainCreated,
   Transfer,
@@ -22,7 +22,7 @@ import {
 } from "../generated/schema";
 import { getDefaultRegistrarForNetwork } from "./defaultRegistrar";
 
-import { toPaddedHexString, containsAny, setupGlobalTracker } from "./utils";
+import { toPaddedHexString, containsAny, setupGlobalTracker, ADDRESS_ZERO } from "./utils";
 
 export function handleDomainCreated(event: DomainCreated1): void {
   let account = new Account(event.params.minter.toHex());
@@ -96,17 +96,23 @@ export function handleTransfer(event: Transfer): void {
   registrarContract.save();
 
   let domainId = toPaddedHexString(event.params.tokenId);
-  let domain = Domain.load(domainId);
-  if (domain === null) {
-    domain = new Domain(domainId);
-    domain.isLocked = false;
-    domain.royaltyAmount = BigInt.fromI32(0);
+
+  if (event.params.to.equals(ADDRESS_ZERO)) {
+    // If burning token, remove domain from store
+    store.remove("Domain", domainId);
+  } else {
+    let domain = Domain.load(domainId);
+    if (domain === null) {
+      domain = new Domain(domainId);
+      domain.isLocked = false;
+      domain.royaltyAmount = BigInt.fromI32(0);
+    }
+    domain.owner = account.id;
+    if (domain.contract === null) {
+      domain.contract = getDefaultRegistrarForNetwork().toHexString();
+    }
+    domain.save();
   }
-  domain.owner = account.id;
-  if (domain.contract === null) {
-    domain.contract = getDefaultRegistrarForNetwork().toHexString();
-  }
-  domain.save();
 
   // ignore transfers to self
   if (event.params.to == event.params.from) {
